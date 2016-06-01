@@ -10,10 +10,6 @@ Created on Wed Jun  1 09:45:43 2016
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-#import matplotlib.lines as mlines
-#from matplotlib import animation
-#from matplotlib.widgets import CheckButtons
-#from vertslider import VertSlider
 
 # Open figure and set axes 1 for drawing Artists
 plt.close('all')
@@ -24,36 +20,49 @@ ax = fig.add_axes([.1, .1, .8, .8])
 ax.set_xticks([])
 ax.set_yticks([])
 
+buttonState = False
+xdata, ydata = .5, .5
+lastX, lastY = xdata, ydata
+
 def on_press(event):
-    if not event.inaxes:
-        return
+    global buttonState
     contains, attrd = pt.contains(event)
     if not contains:
         return
     print 'In on_press()'
+    buttonState = True
+    
+def on_release(event):
+    global buttonState
+    contains, attrd = pt.contains(event)
+    if not contains:
+        xdata = event.xdata
+        ydata = event.ydata
+        buttonState = False
+        pt.center = (xdata, ydata)
+        fig.canvas.draw()
+        return
+    print 'In on_press()'
+    buttonState = False
+    
         
 def on_motion(event):
-    print 'In on_motion()'
-        
-        
-        
+    global pt, xdata, ydata
 
-pt = mpatches.Circle((.5,.5),.02)
+    contains, attrd = pt.contains(event)
+    if buttonState:
+        xdata = event.xdata
+        ydata = event.ydata
+        pt.center = (xdata, ydata)
+        fig.canvas.draw()
+    
+
+pt = mpatches.Circle((xdata, ydata),.02)
 ax.add_patch(pt)
-pt.figure.canvas.mpl_connect('button_press_event',  on_press)
-#pt.figure.canvas.mpl_connect('motion_notify_event', on_motion)
+pt.figure.canvas.mpl_connect('button_press_event',    on_press)
+pt.figure.canvas.mpl_connect('button_release_event',  on_release)
+pt.figure.canvas.mpl_connect('motion_notify_event',   on_motion)
 
-
-
-# The animation function (evaluated repeatedly and endlessly)
-#def animate(num):
-#    pass
-
-
-# Matplotlib animation funcion calls animate()    
-#anim = animation.FuncAnimation(fig, animate, 
-#                               repeat=True,
-#                               interval=0)
 
 # Show plot
 plt.show()
