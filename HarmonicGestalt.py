@@ -15,8 +15,6 @@ from matplotlib import animation
 #from matplotlib.widgets import CheckButtons
 #from vertslider import VertSlider
 
-ptList = []
-
 # Open figure and set axes 1 for drawing Artists
 plt.close('all')
 fig = plt.figure(figsize=(10,10))
@@ -26,8 +24,10 @@ ax = fig.add_axes([.1, .1, .8, .8])
 ax.set_xticks([])
 ax.set_yticks([])
 
-ptList.append(mpatches.Circle((.5,.5),.02))
-ax.add_patch(ptList[-1])
+pt = mpatches.Circle((.5,.5),.02)
+ax.add_patch(pt)
+
+
 
 # The animation function (evaluated repeatedly and endlessly)
 #def animate(num):
