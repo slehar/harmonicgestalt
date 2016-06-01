@@ -11,7 +11,7 @@ Created on Wed Jun  1 09:45:43 2016
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 #import matplotlib.lines as mlines
-from matplotlib import animation
+#from matplotlib import animation
 #from matplotlib.widgets import CheckButtons
 #from vertslider import VertSlider
 
@@ -24,8 +24,21 @@ ax = fig.add_axes([.1, .1, .8, .8])
 ax.set_xticks([])
 ax.set_yticks([])
 
+def on_press(event):
+    print 'In on_press()'
+    if event.inaxes:
+        print '  In axes '
+    else:
+        print '  OUT of axes'
+    contains, attrd = pt.contains(event)
+    if contains:
+        print '  Contains!'
+    else:
+        print '  NOT contains'
+
 pt = mpatches.Circle((.5,.5),.02)
 ax.add_patch(pt)
+pt.figure.canvas.mpl_connect('button_press_event',on_press)
 
 
 
