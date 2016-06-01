@@ -35,10 +35,17 @@ def on_press(event):
         print '  Contains!'
     else:
         print '  NOT contains'
+        
+def on_motion(event):
+    print 'In on_motion()'
+        
+        
+        
 
 pt = mpatches.Circle((.5,.5),.02)
 ax.add_patch(pt)
-pt.figure.canvas.mpl_connect('button_press_event',on_press)
+pt.figure.canvas.mpl_connect('button_press_event',  on_press)
+pt.figure.canvas.mpl_connect('motion_notify_event', on_motion)
 
 
 
