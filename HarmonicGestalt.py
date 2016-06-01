@@ -25,16 +25,12 @@ ax.set_xticks([])
 ax.set_yticks([])
 
 def on_press(event):
-    print 'In on_press()'
-    if event.inaxes:
-        print '  In axes '
-    else:
-        print '  OUT of axes'
+    if not event.inaxes:
+        return
     contains, attrd = pt.contains(event)
-    if contains:
-        print '  Contains!'
-    else:
-        print '  NOT contains'
+    if not contains:
+        return
+    print 'In on_press()'
         
 def on_motion(event):
     print 'In on_motion()'
@@ -45,7 +41,7 @@ def on_motion(event):
 pt = mpatches.Circle((.5,.5),.02)
 ax.add_patch(pt)
 pt.figure.canvas.mpl_connect('button_press_event',  on_press)
-pt.figure.canvas.mpl_connect('motion_notify_event', on_motion)
+#pt.figure.canvas.mpl_connect('motion_notify_event', on_motion)
 
 
 
