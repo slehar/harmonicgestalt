@@ -15,7 +15,7 @@ ptRad = .01
 
 # Open figure and set axes 1 for drawing Artists
 plt.close('all')
-fig = plt.figure(figsize=(10,10))
+fig = plt.figure(figsize=(8,8))
 fig.canvas.set_window_title('Harmonic Gestalt')
 fig.text(.35, .92, 'Harmonic Gestalt', size=24)
 ax = fig.add_axes([.1, .1, .8, .8])
@@ -33,9 +33,11 @@ xdata, ydata = .5, .5
 def on_press(event):
     global buttonState, selectedPt
     print 'In on_press()'
+    inAPoint = False
     for pt in ptList:
         contains, attrd = pt['circle'].contains(event)
         if contains:
+            inAPoint = True
             print '  Contains!'
             if pt['selected']:
                 pt['selected'] = False
@@ -45,11 +47,22 @@ def on_press(event):
                 selectedPt = pt
                 pt['circle'].set_fc('red')
             fig.canvas.draw()
+            break
     buttonState = True
+    
+    if not inAPoint:
+        print '*** NEW POINT !***'
+        xdata = event.xdata
+        ydata = event.ydata
+        circ = mpatches.Circle((xdata, ydata), ptRad)
+        ax.add_patch(circ)
+        ptList.append({'xPos':xdata, 'yPos':ydata, 'selected':True,
+                       'circle':circ})
+        selectedPt = ptList[-1]
 
 ########################    
 def on_release(event):
-    global buttonState
+    global buttonState, selectedPt
     print 'In on_release()'
     for pt in ptList:
         #contains, attrd = pt['circle'].contains(event)
@@ -59,23 +72,21 @@ def on_release(event):
             pt['circle'].center = (xdata, ydata)
             buttonState = False
             pt['selected'] = False
+            selectedPt = None
             pt['circle'].set_fc('blue')
             fig.canvas.draw()
     buttonState = False
     
 ########################        
 def on_motion(event):
-    global pt, xdata, ydata
+    global xdata, ydata
 
     print 'In on_motion()'
-    for pt in ptList:
-        contains, attrd = pt['circle'].contains(event)
-        if buttonState:
-            xdata = event.xdata
-            ydata = event.ydata
-            pt['circle'].center = (xdata, ydata)
-            fig.canvas.draw()
-            break
+    if buttonState:
+        xdata = event.xdata
+        ydata = event.ydata
+        selectedPt['circle'].center = (xdata, ydata)
+        fig.canvas.draw()
     
 print 'init done'
 ptList[0]['circle'] = mpatches.Circle((xdata, ydata), ptRad)
