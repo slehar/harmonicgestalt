@@ -10,8 +10,18 @@ Created on Wed Jun  1 09:45:43 2016
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import pyaudio
 
 ptRad = .01
+
+# PyAudio 
+pa = pyaudio.PyAudio()
+stream = pa.open(
+            format = pa.get_format_from_width(1),
+            channels = 1,
+            rate = RATE,
+            output = True,
+            frames_per_buffer=CHUNK)
 
 # Open figure and set axes 1 for drawing Artists
 plt.close('all')
@@ -87,6 +97,10 @@ def on_motion(event):
         ydata = event.ydata
         selectedPt['circle'].center = (xdata, ydata)
         fig.canvas.draw()
+	data = ''.join([chr(int(math.sin(x/((RATE/wave)/math.pi))*127+128)) 
+                    for x in xrange(RATE)])
+    stream.write(data)
+   	   
     
 print 'init done'
 ptList[0]['circle'] = mpatches.Circle((xdata, ydata), ptRad)
