@@ -84,8 +84,7 @@ def press(event):
         stream.stop_stream()
         stream.close()
         pa.terminate()
-#        raise Exception('exit')
-        sys.exit()
+        plt.close()
     elif event.key == 'backspace':
         if len(ptList) > 0:
             lastPt = ptList.pop()
