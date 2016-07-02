@@ -7,24 +7,92 @@ Created on Wed Jun  1 09:45:43 2016
 @author: slehar
 """
 
-
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+import numpy as np
 import pyaudio
 
-ptRad = .01
+ptRad     = .01      # Radius of points
+RATE      = 44100    # bytes per second data rate
+BASEFREQ  = 500      # base frequency Hz
+CHUNK     = 8192     # frames per buffer 
 
-# PyAudio 
+# global variables
+twoPi = float(2.0*np.pi)
+data  = np.zeros(RATE, dtype=float)
+time  = np.linspace(0, twoPi, RATE)
+fData = []
+
+ptList = []
+ptList.append({'xPos':.5, 'yPos':.5, 'selected':False})
+selectedPt = None
+freqList = []
+
+buttonState = False
+xdata, ydata = .5, .5
+
+# Update Wave to be played based on current slider positions
+def updateWave():
+    global data, fData, time, ptList, freqList
+
+    freqList = []
+    print 'In updateWave1: freqList = %r'%freqList                    
+
+    if len(ptList) < 2:
+        print 'len(ptList < 2)'
+        return
+    elif len(ptList) == 2:
+        print 'len(ptList == 2)'
+        dist = np.sqrt((ptList[0]['xPos'] - ptList[1]['xPos'])**2. +
+                       (ptList[0]['yPos'] - ptList[1]['yPos'])**2.)
+        freqList.append(BASEFREQ/dist)
+    else:
+        print 'len(ptList > 2)'
+        for point1 in ptList:
+            for point2 in ptList:
+                if point1 is not point2:
+                    dist = np.sqrt((point1['xPos'] - point2['xPos'])**2. +
+                                   (point1['yPos'] - point2['yPos'])**2.)
+                    print '  dist = %5.2f'%dist
+                    freqList.append(BASEFREQ/dist)
+                    
+    print 'In updateWave2: freqList = %r'%freqList                    
+                    
+    fData = np.zeros(RATE, dtype=float)
+    for freq in freqList:
+        fData += np.sin(time*freq)
+    fData = fData / np.max(np.abs(fData)) * 127 + 128
+#    lastTime = time[-1] + 1./float(RATE)
+#    time = np.linspace(lastTime, lastTime+1., RATE)
+    data = np.uint8(fData)
+    
+# PyAudio Callback - gets called repeatedly
+def paCallback(in_data, frame_count, time_info, status):
+    global data
+    return (data, pyaudio.paContinue)
+
+# PyAudio open audio stream
 pa = pyaudio.PyAudio()
 stream = pa.open(
             format = pa.get_format_from_width(1),
             channels = 1,
             rate = RATE,
             output = True,
+            stream_callback=paCallback,
             frames_per_buffer=CHUNK)
 
+# Keypress 'q' to quit
+def press(event):
+    sys.stdout.flush()
+    if event.key == 'q':
+        stream.stop_stream()
+        stream.close()
+        pa.terminate()
+        raise Exception('exit')
+#        sys.exit()
+
 # Open figure and set axes 1 for drawing Artists
-plt.close('all')
+#plt.close('all')
 fig = plt.figure(figsize=(8,8))
 fig.canvas.set_window_title('Harmonic Gestalt')
 fig.text(.35, .92, 'Harmonic Gestalt', size=24)
@@ -32,12 +100,9 @@ ax = fig.add_axes([.1, .1, .8, .8])
 ax.set_xticks([])
 ax.set_yticks([])
 
-ptList = []
-ptList.append({'xPos':.5, 'yPos':.5, 'selected':False})
-selectedPt = None
 
-buttonState = False
-xdata, ydata = .5, .5
+# Connect fig to keypress callback function
+fig.canvas.mpl_connect('key_press_event', press)
 
 ########################
 def on_press(event):
@@ -69,6 +134,7 @@ def on_press(event):
         ptList.append({'xPos':xdata, 'yPos':ydata, 'selected':True,
                        'circle':circ})
         selectedPt = ptList[-1]
+        updateWave()
 
 ########################    
 def on_release(event):
@@ -86,20 +152,21 @@ def on_release(event):
             pt['circle'].set_fc('blue')
             fig.canvas.draw()
     buttonState = False
+    updateWave()
     
 ########################        
 def on_motion(event):
-    global xdata, ydata
+    global xdata, ydata, selectedPt, ptList
 
-    print 'In on_motion()'
     if buttonState:
+        print 'In on_motion buttonstate = True'
         xdata = event.xdata
         ydata = event.ydata
         selectedPt['circle'].center = (xdata, ydata)
+        selectedPt['xPos'] = xdata
+        selectedPt['yPos'] = ydata
         fig.canvas.draw()
-	data = ''.join([chr(int(math.sin(x/((RATE/wave)/math.pi))*127+128)) 
-                    for x in xrange(RATE)])
-    stream.write(data)
+        updateWave()
    	   
     
 print 'init done'
@@ -112,9 +179,19 @@ fig.canvas.mpl_connect('motion_notify_event',   on_motion)
 print 'events connected'
 
 
+# Initial update of wave
+print 'freqList = %r'%freqList
+print 'Call updateWave'
+updateWave()
+print 'freqList = %r'%freqList
+
+# start the stream (4)
+print 'Start stream'
+stream.start_stream()
+
 # Show plot
 plt.show()
-print 'showed!'
+print 'Plot showed!'
 figmgr=plt.get_current_fig_manager()
 figmgr.canvas.manager.window.raise_()
 geom=figmgr.window.geometry()
