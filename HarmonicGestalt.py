@@ -21,7 +21,10 @@ CHUNK     = 8192     # frames per buffer
 twoPi = float(2.0*np.pi)
 data  = np.zeros(RATE, dtype=float)
 time  = np.linspace(0, twoPi, RATE)
-fData = []
+fData = np.sin(time)
+#plotTime = np.linspace(0, twoPi, num=100)
+plotTime = np.arange(0, twoPi, twoPi/100.)
+plotData = np.sin(plotTime) * 128 + 127
 
 ptList = []
 ptList.append({'xPos':.5, 'yPos':.5, 'selected':False})
@@ -33,7 +36,7 @@ xdata, ydata = .5, .5
 
 # Update Wave to be played based on current slider positions
 def updateWave():
-    global data, fData, time, ptList, freqList
+    global data, fData, time, ptList, freqList, line
 
     freqList = []
 
@@ -59,6 +62,9 @@ def updateWave():
     fData = fData / np.max(np.abs(fData)) * 127 + 128
     lastTime = time[-1] + (time[-1] - time[-2])
     time = np.linspace(lastTime, lastTime+twoPi, RATE)
+#    line.set_xdata(time[:100])
+    line.set_ydata(fData[:100])
+    fig.canvas.draw()
     data = np.uint8(fData)
     
 # PyAudio Callback - gets called repeatedly
@@ -98,14 +104,23 @@ fig = plt.figure(figsize=(10,8))
 aspect = 10./8.
 fig.canvas.set_window_title('Harmonic Gestalt')
 #fig.text(.35, .92, 'Harmonic Gestalt', size=24)
+
+#### Main axes ####
 ax = fig.add_axes([.1, .225, .7, .75])
 ax.set_xticks([])
 ax.set_yticks([])
+
+#### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05, .7, .15])
-axSl1   = fig.add_axes([.825, .7, .05, .275])
+axSpect.set_xlim([0.,twoPi])
+axSpect.set_ylim([0., 255.])
+line, = axSpect.plot(plotTime, plotData)
+
+#### Axes for sliders ####
+axSl1 = fig.add_axes([.825, .7, .05, .275])
 axSl1.set_xticks([])
 axSl1.set_yticks([])
-axSl2   = fig.add_axes([.92, .7, .05, .275])
+axSl2 = fig.add_axes([.92, .7, .05, .275])
 axSl2.set_xticks([])
 axSl2.set_yticks([])
 
