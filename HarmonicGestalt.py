@@ -44,21 +44,21 @@ def updateWave():
     elif len(ptList) == 2:
         dist = np.sqrt((ptList[0]['xPos'] - ptList[1]['xPos'])**2. +
                        (ptList[0]['yPos'] - ptList[1]['yPos'])**2.)
-        freqList.append((BASEFREQ/dist))
+        freqList.append(int(BASEFREQ/dist))
     else:
         for point1 in ptList:
             for point2 in ptList:
                 if point1 is not point2:
                     dist = np.sqrt((point1['xPos'] - point2['xPos'])**2. +
                                    (point1['yPos'] - point2['yPos'])**2.)
-                    freqList.append((BASEFREQ/dist))
+                    freqList.append(int(BASEFREQ/dist))
                                         
     fData = np.zeros(RATE, dtype=float)
     for freq in freqList:
         fData += np.sin(time*freq)
     fData = fData / np.max(np.abs(fData)) * 127 + 128
-#    lastTime = time[-1] + 1./float(RATE)
-#    time = np.linspace(lastTime, lastTime+1., RATE)
+    lastTime = time[-1] + (time[-1] - time[-2])
+    time = np.linspace(lastTime, lastTime+twoPi, RATE)
     data = np.uint8(fData)
     
 # PyAudio Callback - gets called repeatedly
@@ -94,12 +94,20 @@ def press(event):
 
 # Open figure and set axes 1 for drawing Artists
 plt.close('all')
-fig = plt.figure(figsize=(8,8))
+fig = plt.figure(figsize=(10,8))
+aspect = 10./8.
 fig.canvas.set_window_title('Harmonic Gestalt')
-fig.text(.35, .92, 'Harmonic Gestalt', size=24)
-ax = fig.add_axes([.1, .1, .8, .8])
+#fig.text(.35, .92, 'Harmonic Gestalt', size=24)
+ax = fig.add_axes([.1, .225, .7, .75])
 ax.set_xticks([])
 ax.set_yticks([])
+axSpect = fig.add_axes([.1, .05, .7, .15])
+axSl1   = fig.add_axes([.825, .7, .05, .275])
+axSl1.set_xticks([])
+axSl1.set_yticks([])
+axSl2   = fig.add_axes([.92, .7, .05, .275])
+axSl2.set_xticks([])
+axSl2.set_yticks([])
 
 
 # Connect fig to keypress callback function
@@ -175,7 +183,7 @@ fig.canvas.mpl_connect('motion_notify_event',   on_motion)
 
 
 # Initial update of wave
-updateWave()
+#updateWave()
 
 # start the stream (4)
 stream.start_stream()
