@@ -63,7 +63,12 @@ def updateWave():
     lastTime = time[-1] + (time[-1] - time[-2])
     time = np.linspace(lastTime, lastTime+twoPi, RATE)
 #    line.set_xdata(time[:100])
-    line.set_ydata(fData[:100])
+    yData = np.abs(np.fft.fft(fData[:100]))
+    yData /= yData.max()
+#    yDataSwap = np.hstack(yData[:50], yData[50:])
+#    yDataSwap = yData[:50] + yData[50:]
+    yDataSwap = np.fft.fftshift(yData)
+    line.set_ydata(yDataSwap)
     fig.canvas.draw()
     data = np.uint8(fData)
     
@@ -114,7 +119,8 @@ ax.set_yticks([])
 axSpect = fig.add_axes([.1, .05, .7, .15])
 axSpect.set_xlim([0.,twoPi])
 axSpect.set_ylim([0., 255.])
-line, = axSpect.plot(plotTime, plotData)
+#line, = axSpect.plot(plotTime, plotData)
+line, = axSpect.semilogy(plotTime, plotData)
 
 #### Axes for sliders ####
 axSl1 = fig.add_axes([.825, .7, .05, .275])
