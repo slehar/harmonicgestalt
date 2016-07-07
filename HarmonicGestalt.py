@@ -16,14 +16,15 @@ ptRad     = .01      # Radius of points
 RATE      = 44100    # bytes per second data rate
 BASEFREQ  = 500      # base frequency Hz
 CHUNK     = 8192     # frames per buffer 
+PLOTWIDTH = 512      # Width of plot trace
 
 # global variables
 twoPi = float(2.0*np.pi)
 data  = np.zeros(RATE, dtype=float)
 time  = np.linspace(0, twoPi, RATE)
 fData = np.sin(time)
-#plotTime = np.linspace(0, twoPi, num=100)
-plotTime = np.arange(0, twoPi, twoPi/100.)
+#plotTime = np.linspace(0, twoPi, num=PLOTWIDTH)
+plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
 plotData = np.sin(plotTime) * 128 + 127
 
 ptList = []
@@ -63,7 +64,7 @@ def updateWave():
     lastTime = time[-1] + (time[-1] - time[-2])
     time = np.linspace(lastTime, lastTime+twoPi, RATE)
 #    line.set_xdata(time[:100])
-    yData = np.abs(np.fft.fft(fData[:100]))
+    yData = np.abs(np.fft.fft(fData[:PLOTWIDTH]))
     yData /= yData.max()
 #    yDataSwap = np.hstack(yData[:50], yData[50:])
 #    yDataSwap = yData[:50] + yData[50:]
