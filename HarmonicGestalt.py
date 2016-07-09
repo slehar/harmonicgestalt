@@ -40,7 +40,6 @@ def updateWave():
     global data, fData, time, ptList, freqList, line
 
     freqList = []
-
     if len(ptList) < 2:
         fData = np.zeros(RATE, dtype=float)
         data = np.uint8(fData)
@@ -65,9 +64,9 @@ def updateWave():
     time = np.linspace(lastTime, lastTime+twoPi, RATE)
 #    line.set_xdata(time[:100])
     yData = np.abs(np.fft.fft(fData[:PLOTWIDTH]))
-    yData /= yData.max()
-#    yDataSwap = np.hstack(yData[:50], yData[50:])
-#    yDataSwap = yData[:50] + yData[50:]
+    yData /= 100.
+#    yData /= yData.max()
+#    yData = np.log(yData)
     yDataSwap = np.fft.fftshift(yData)
     line.set_ydata(yDataSwap)
     fig.canvas.draw()
@@ -118,10 +117,15 @@ ax.set_yticks([])
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05, .7, .15])
+#axSpect.set_xlim([0.,twoPi])
 axSpect.set_xlim([0.,twoPi])
-axSpect.set_ylim([0., 255.])
+#axSpect.set_ylim([0., 255.])
+axSpect.set_ylim([0., 1000.])
+#axSpect.set_yticks(['0', '500', '1000'])
 #line, = axSpect.plot(plotTime, plotData)
 line, = axSpect.semilogy(plotTime, plotData)
+axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
+
 
 #### Axes for sliders ####
 axSl1 = fig.add_axes([.825, .7, .05, .275])
