@@ -12,16 +12,15 @@ import matplotlib.patches as mpatches
 import numpy as np
 import pyaudio
 
+# global variables
 ptRad     = .01      # Radius of points
 RATE      = 44100    # bytes per second data rate
 BASEFREQ  = 500      # base frequency Hz
 CHUNK     = 8192     # frames per buffer 
 PLOTWIDTH = 512      # Width of plot trace
-
-# global variables
 twoPi = float(2.0*np.pi)
-data  = np.zeros(RATE, dtype=float)
-time  = np.linspace(0, twoPi, RATE)
+data  = np.zeros(RATE, dtype=float)     # buffer of data
+time  = np.linspace(0, twoPi, RATE)     # time of data
 fData = np.sin(time)
 #plotTime = np.linspace(0, twoPi, num=PLOTWIDTH)
 plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
@@ -34,6 +33,24 @@ freqList = []
 
 buttonState = False
 xdata, ydata = .5, .5
+
+    
+# PyAudio Callback - gets called repeatedly
+def paCallback(in_data, frame_count, time_info, status):
+    global data
+    return (data, pyaudio.paContinue)
+
+# PyAudio open audio stream
+pa = pyaudio.PyAudio()
+stream = pa.open(
+            format = pa.get_format_from_width(1),
+            channels = 1,
+            rate = RATE,
+            output = True,
+            stream_callback=paCallback,
+            frames_per_buffer=CHUNK)
+
+######## Keyboard callback updatewave ########
 
 # Update Wave to be played based on current slider positions
 def updateWave():
@@ -71,44 +88,13 @@ def updateWave():
     line.set_ydata(yDataSwap)
     fig.canvas.draw()
     data = np.uint8(fData)
-    
-# PyAudio Callback - gets called repeatedly
-def paCallback(in_data, frame_count, time_info, status):
-    global data
-    return (data, pyaudio.paContinue)
 
-# PyAudio open audio stream
-pa = pyaudio.PyAudio()
-stream = pa.open(
-            format = pa.get_format_from_width(1),
-            channels = 1,
-            rate = RATE,
-            output = True,
-            stream_callback=paCallback,
-            frames_per_buffer=CHUNK)
 
-# Keypress 'q' to quit
-def press(event):
-    global ptList, data
-    sys.stdout.flush()
-    if event.key == 'q':
-        stream.stop_stream()
-        stream.close()
-        pa.terminate()
-        plt.close()
-    elif event.key == 'backspace':
-        if len(ptList) > 0:
-            lastPt = ptList.pop()
-            lastPt['circle'].remove()
-            fig.canvas.draw()
-            updateWave()
-
-# Open figure and set axes 1 for drawing Artists
+####### Open figure and set axes 1 for drawing Artists ########
 plt.close('all')
 fig = plt.figure(figsize=(10,8))
 aspect = 10./8.
 fig.canvas.set_window_title('Harmonic Gestalt')
-#fig.text(.35, .92, 'Harmonic Gestalt', size=24)
 
 #### Main axes ####
 ax = fig.add_axes([.1, .225, .7, .75])
@@ -119,6 +105,7 @@ ax.set_yticks([])
 axSpect = fig.add_axes([.1, .05, .7, .15])
 #axSpect.set_xlim([0.,twoPi])
 axSpect.set_xlim([0.,twoPi])
+#axSpect.set_xticks([-500, 0, 500])
 #axSpect.set_ylim([0., 255.])
 axSpect.set_ylim([0., 1000.])
 #axSpect.set_yticks(['0', '500', '1000'])
@@ -135,9 +122,21 @@ axSl2 = fig.add_axes([.92, .7, .05, .275])
 axSl2.set_xticks([])
 axSl2.set_yticks([])
 
-
-# Connect fig to keypress callback function
-fig.canvas.mpl_connect('key_press_event', press)
+# Keypress 'q' to quit
+def press(event):
+    global ptList, data
+    sys.stdout.flush()
+    if event.key == 'q':
+        stream.stop_stream()
+        stream.close()
+        pa.terminate()
+        plt.close()
+    elif event.key == 'backspace':
+        if len(ptList) > 0:
+            lastPt = ptList.pop()
+            lastPt['circle'].remove()
+            fig.canvas.draw()
+            updateWave()
 
 ########################
 def on_press(event):
@@ -164,7 +163,9 @@ def on_press(event):
         ydata = event.ydata
         circ = mpatches.Circle((xdata, ydata), ptRad)
         ax.add_patch(circ)
-        ptList.append({'xPos':xdata, 'yPos':ydata, 'selected':True,
+        ptList.append({'xPos':xdata,
+                       'yPos':ydata,
+                       'selected':True,
                        'circle':circ})
         selectedPt = ptList[-1]
         updateWave()
@@ -203,9 +204,12 @@ def on_motion(event):
     
 ptList[0]['circle'] = mpatches.Circle((xdata, ydata), ptRad)
 ax.add_patch(ptList[0]['circle'])
+
+# Connect fig to events
 fig.canvas.mpl_connect('button_press_event',    on_press)
 fig.canvas.mpl_connect('button_release_event',  on_release)
 fig.canvas.mpl_connect('motion_notify_event',   on_motion)
+fig.canvas.mpl_connect('key_press_event',       press)
 
 
 # Initial update of wave
@@ -216,6 +220,8 @@ stream.start_stream()
 
 # Show plot
 plt.show()
+
+# Gef fig manager to raise window in top left corner (10,10)
 figmgr=plt.get_current_fig_manager()
 figmgr.canvas.manager.window.raise_()
 geom=figmgr.window.geometry()
