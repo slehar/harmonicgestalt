@@ -11,11 +11,16 @@ from matplotlib.colors import colorConverter
 import matplotlib.pyplot as plt
 import numpy as np
 
+import matplotlib
+
 plt.rcParams['image.cmap'] = 'gray' 
 
-#### Fugure ####
+#### Figure ####
+figYSize, figXSize = (15,8)
+winAspect = float(figYSize)/float(figXSize)
+
 plt.close('all')
-fig = plt.figure()
+fig = plt.figure(figsize=(figYSize,figXSize))
 fig.canvas.set_window_title('HarmonicGestalt3D')
 
 # Keypress 'q' to quit callback function
@@ -27,17 +32,26 @@ def press(event):
 fig.canvas.mpl_connect('key_press_event', press)
 
 
-#### Axes ####
-ax = fig.gca(projection='3d')
+#### Stimulus Axes ####
+ax   = fig.add_axes([.05,.2,.4,.4*winAspect])
+ax.axes.set_xticks([])
+ax.axes.set_yticks([])
+ax.set_title('Stimulus')
 
-ax.set_xlabel('X')
-ax.set_ylabel('Y')
-ax.set_zlabel('Z')
+#### Percept Axes ####
+ax0 = fig.add_axes([.55,.2,.4,.4*winAspect])
+ax0.axes.set_xticks([])
+ax0.axes.set_yticks([])
+ax0.set_title('Percept')
 
-ax.set_xlim3d(-1, 1)
-ax.set_ylim3d(-1, 1)
-ax.set_zlim3d(-1, 1)
-
+#### 3D Axes ####
+ax3d = fig.add_axes([.57,.22,.38,.38*winAspect], projection='3d')
+ax3d.set_xlabel('X')
+ax3d.set_ylabel('Y')
+ax3d.set_zlabel('Z')
+ax3d.set_xlim3d(-1, 1)
+ax3d.set_ylim3d(-1, 1)
+ax3d.set_zlim3d(-1, 1)
 
 def cc(arg):
     return colorConverter.to_rgba(arg, alpha=0.6)
@@ -48,14 +62,14 @@ xs = np.arange(0, 10, 0.4)
 verts = [[[0., 0.], [1., 0.], [1., 1.], [0., 1.], [0., 0.]]]
 poly = PolyCollection(verts)
 poly.set_alpha(0.7)
-ax.add_collection3d(poly, zs=0., zdir='y')
+ax3d.add_collection3d(poly, zs=0., zdir='y')
 
 # Surface plot
 
 X = np.array([.25, .75, .75, .25, .25])
 Y = np.array([.25, .25, .75, .75, .25])
 Z = np.array([0.3,  0.3,  0.3,  0.3,  0.3])
-#ax.plot_surface(X, Y, Z, color='b', facecolors='r', shade=True)
+#ax3d.plot_surface(X, Y, Z, color='b', facecolors='r', shade=True)
 
 plt.show()
 
