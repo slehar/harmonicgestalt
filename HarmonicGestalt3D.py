@@ -47,29 +47,32 @@ ax0.set_title('Percept')
 #### 3D Axes ####
 ax3d = fig.add_axes([.57,.22,.38,.38*winAspect], projection='3d')
 ax3d.set_xlabel('X')
-ax3d.set_ylabel('Y')
-ax3d.set_zlabel('Z')
+ax3d.set_ylabel('Z') # swap Y and Z
+ax3d.set_zlabel('Y')
 ax3d.set_xlim3d(-1, 1)
 ax3d.set_ylim3d(-1, 1)
-ax3d.set_zlim3d(-1, 1)
+ax3d.set_zlim3d(1, -1)
 
-def cc(arg):
-    return colorConverter.to_rgba(arg, alpha=0.6)
+# Back plane
+verts3D = np.array([[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[-1,-1,1]])
+vertsXY = [verts3D[:,:2]]
+vertsZ  = verts3D[:,2]
+poly1 = PolyCollection(vertsXY)
+poly1.set_alpha(0.7)
+poly1.set_color('w')
+poly1.set_edgecolor('k')
+ax3d.add_collection3d(poly1, zs=vertsZ, zdir='y')
 
-xs = np.arange(0, 10, 0.4)
+# Front plane
+verts3D = np.array([[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,-1]])
+vertsXY = [verts3D[:,:2]]
+vertsZ  = verts3D[:,2]
+poly2 = PolyCollection(vertsXY)
+poly2.set_alpha(0.7)
+poly2.set_color('w')
+poly2.set_edgecolor('k')
+ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 
-#### Polygon ####
-verts = [[[0., 0.], [1., 0.], [1., 1.], [0., 1.], [0., 0.]]]
-poly = PolyCollection(verts)
-poly.set_alpha(0.7)
-ax3d.add_collection3d(poly, zs=0., zdir='y')
-
-# Surface plot
-
-X = np.array([.25, .75, .75, .25, .25])
-Y = np.array([.25, .25, .75, .75, .25])
-Z = np.array([0.3,  0.3,  0.3,  0.3,  0.3])
-#ax3d.plot_surface(X, Y, Z, color='b', facecolors='r', shade=True)
 
 plt.show()
 
