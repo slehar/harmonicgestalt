@@ -8,36 +8,26 @@ Created on Wed Jun  1 09:45:43 2016
 """
 
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
+from   matplotlib.widgets import Slider
 import numpy as np
 import pyaudio
 
 # global variables
-ptRad     = .01      # Radius of points
 RATE      = 44100    # bytes per second data rate
 BASEFREQ  = 500      # base frequency Hz
 CHUNK     = 8192     # frames per buffer 
-PLOTWIDTH = 512      # Width of plot trace
+plotWidth = 512
 twoPi = float(2.0*np.pi)
 data  = np.zeros(RATE, dtype=float)     # buffer of data
 time  = np.linspace(0, twoPi, RATE)     # time of data
 fData = np.sin(time)
-#plotTime = np.linspace(0, twoPi, num=PLOTWIDTH)
-plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
-plotData = np.sin(plotTime) * 128 + 127
-
-ptList = []
-ptList.append({'xPos':.5, 'yPos':.5, 'selected':False})
-selectedPt = None
-freqList = []
-
-buttonState = False
-xdata, ydata = .5, .5
+freq = 0.
 
     
 # PyAudio Callback - gets called repeatedly
 def paCallback(in_data, frame_count, time_info, status):
     global data
+    plotLines[0].set_ydata(data[:plotWidth])
     return (data, pyaudio.paContinue)
 
 # PyAudio open audio stream
@@ -68,8 +58,8 @@ fig.canvas.set_window_title('Test Audio')
 
 #### Main axes ####
 ax = fig.add_axes([.1, .225, .7, .75])
-ax.set_xlim([0., RATE])
-ax.set_ylim([-1, 1])
+ax.set_xlim([0., plotWidth])
+ax.set_ylim([0,255])
 #ax.set_xticks([])
 #ax.set_yticks([])
 
@@ -83,10 +73,33 @@ def press(event):
         plt.close()
 fig.canvas.mpl_connect('key_press_event', press)
 
+plt.ion()
+plotLines = plt.plot(data[:plotWidth])
+
+#  frequency slider
+axSlider1 = fig.add_axes([0.3, 0.125, 0.234, 0.04])
+axSlider1.set_xticks([])
+axSlider1.set_yticks([])
+slider1 = Slider(axSlider1, 'frequency', 100, 1000., valinit=300.)
+freq = slider1.val
+
+def update1(val):
+    global freq, data, fData, time
+    freq = slider1.val
+    fData = np.zeros(RATE, dtype=float)
+    fData += np.sin(time*freq)
+    fData = fData / np.max(np.abs(fData)) * 127 + 128
+    lastTime = time[-1] + (time[-1] - time[-2])
+    time = np.linspace(lastTime, lastTime+twoPi, RATE)
+    plt.sca(ax)
+    data = np.uint8(fData)
+    plt.pause(.001)
+    
+slider1.on_changed(update1)
+
+
 # start the stream (4)
 stream.start_stream()
-
-plt.plot(data)
 
 # Show plot
 plt.show()
