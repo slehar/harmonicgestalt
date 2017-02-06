@@ -65,7 +65,8 @@ plotLines1 = plt.plot(data[:plotWidth])
 
 #### Axes 2 ####
 ax2 = fig.add_axes([.55,.4,.4,.2])
-ax2.set_xlim([RATE-plotWidth, RATE])
+#ax2.set_xlim([RATE-plotWidth, RATE])
+ax2.set_xlim([0, plotWidth])
 ax2.set_ylim([0,255])
 plt.sca(ax2)
 plotLines2 = plt.plot(data[RATE-plotWidth:RATE])
