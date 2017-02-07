@@ -27,7 +27,9 @@ freq = 0.
 # PyAudio Callback - gets called repeatedly
 def paCallback(in_data, frame_count, time_info, status):
     global data
+    plotLines1[0].set_xdata(time[:plotWidth])
     plotLines1[0].set_ydata(data[:plotWidth])
+    plotLines2[0].set_xdata(time[RATE-plotWidth:RATE])
     plotLines2[0].set_ydata(data[RATE-plotWidth:RATE])
     return (data, pyaudio.paContinue)
 
@@ -42,11 +44,13 @@ stream = pa.open(
             frames_per_buffer=CHUNK)
 
 fData = np.zeros(RATE, dtype=float)
-for freq in [300, 400, 500]:
+#for freq in [300, 400, 500]:
+for freq in [500]:
     fData += np.sin(time*freq)
+#    fData += np.sin(2.*np.pi*time*freq*int(40000/RATE))
 fData = fData / np.max(np.abs(fData)) * 127 + 128
 lastTime = time[-1] + (time[-1] - time[-2])
-time = np.linspace(lastTime, lastTime+twoPi, RATE)
+time = np.linspace(lastTime, lastTime+RATE, RATE)
 data = np.uint8(fData)
 
 
@@ -61,15 +65,15 @@ ax1 = fig.add_axes([.05,.4,.4,.2])
 ax1.set_xlim([0., plotWidth])
 ax1.set_ylim([0,255])
 plt.sca(ax1)
-plotLines1 = plt.plot(data[:plotWidth])
+plotLines1 = plt.plot(time[:plotWidth], data[:plotWidth])
 
 #### Axes 2 ####
 ax2 = fig.add_axes([.55,.4,.4,.2])
-#ax2.set_xlim([RATE-plotWidth, RATE])
-ax2.set_xlim([0, plotWidth])
+ax2.set_xlim([RATE-plotWidth, RATE])
+#ax2.set_xlim([0, plotWidth])
 ax2.set_ylim([0,255])
 plt.sca(ax2)
-plotLines2 = plt.plot(data[RATE-plotWidth:RATE])
+plotLines2 = plt.plot(time[RATE-plotWidth:RATE], data[RATE-plotWidth:RATE])
 
 
 # Keypress 'q' to quit
