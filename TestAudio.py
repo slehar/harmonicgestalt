@@ -22,19 +22,19 @@ data  = np.zeros(RATE, dtype=float)     # buffer of data
 time  = np.linspace(0, twoPi, RATE)     # time of data
 fData = np.sin(time)
 freq = 0.
-dataSet = False
 
-    
-
-fData = np.zeros(RATE, dtype=float)
-#for freq in [300, 400, 500]:
-for freq in [500]:
+# Set time and data arrays    
+time  = np.linspace(0, twoPi, RATE)     # time 
+fData = np.zeros(RATE, dtype=float)     # data
+for freq in [300, 400, 500]:
+#for freq in [500]:
     fData += np.sin(time*freq)
 #    fData += np.sin(2.*np.pi*time*freq*int(40000/RATE))
 fData = fData / np.max(np.abs(fData)) * 127 + 128
-lastTime = time[-1] + (time[-1] - time[-2])
-time = np.linspace(lastTime, lastTime+RATE, RATE)
 data = np.uint8(fData)
+#lastTime = time[-1] + (time[-1] - time[-2])
+lastTime = 0.
+time = np.linspace(lastTime, lastTime+RATE, RATE)
 
 
 ####### Open figure and set axes 1 for drawing Artists ########
@@ -65,16 +65,14 @@ ax2.set_yticks(np.linspace(0,255,9))
 ax2.set_title('End of buffer')
 plt.sca(ax2)
 plotLines2 = plt.plot(time[RATE-plotWidth:RATE], data[RATE-plotWidth:RATE])
-dataSet = True
 
 # PyAudio Callback - gets called repeatedly
 def paCallback(in_data, frame_count, time_info, status):
     global data
-    if dataSet:
-        plotLines1[0].set_xdata(time[:plotWidth])
-        plotLines1[0].set_ydata(data[:plotWidth])
-        plotLines2[0].set_xdata(time[RATE-plotWidth:RATE])
-        plotLines2[0].set_ydata(data[RATE-plotWidth:RATE])
+    plotLines1[0].set_xdata(time[:plotWidth])
+    plotLines1[0].set_ydata(data[:plotWidth])
+    plotLines2[0].set_xdata(time[RATE-plotWidth:RATE])
+    plotLines2[0].set_ydata(data[RATE-plotWidth:RATE])
     return (data, pyaudio.paContinue)
 
 # PyAudio open audio stream
