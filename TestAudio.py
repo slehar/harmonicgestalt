@@ -8,7 +8,7 @@ Created on Wed Jun  1 09:45:43 2016
 """
 
 import matplotlib.pyplot as plt
-from   matplotlib.widgets import Slider
+#from   matplotlib.widgets import Slider
 import numpy as np
 import pyaudio
 
@@ -16,21 +16,23 @@ import pyaudio
 RATE      = 44100    # bytes per second data rate
 BASEFREQ  = 500      # base frequency Hz
 CHUNK     = 8192     # frames per buffer 
-plotWidth = 512
+plotWidth = 500
 twoPi = float(2.0*np.pi)
 data  = np.zeros(RATE, dtype=float)     # buffer of data
 time  = np.linspace(0, twoPi, RATE)     # time of data
 fData = np.sin(time)
 freq = 0.
+dataSet = False
 
     
 # PyAudio Callback - gets called repeatedly
 def paCallback(in_data, frame_count, time_info, status):
     global data
-    plotLines1[0].set_xdata(time[:plotWidth])
-    plotLines1[0].set_ydata(data[:plotWidth])
-    plotLines2[0].set_xdata(time[RATE-plotWidth:RATE])
-    plotLines2[0].set_ydata(data[RATE-plotWidth:RATE])
+    if dataSet:
+        plotLines1[0].set_xdata(time[:plotWidth])
+        plotLines1[0].set_ydata(data[:plotWidth])
+        plotLines2[0].set_xdata(time[RATE-plotWidth:RATE])
+        plotLines2[0].set_ydata(data[RATE-plotWidth:RATE])
     return (data, pyaudio.paContinue)
 
 # PyAudio open audio stream
@@ -63,18 +65,26 @@ fig.canvas.set_window_title('Test Audio')
 #### Axes 1 ####
 ax1 = fig.add_axes([.05,.4,.4,.2])
 ax1.set_xlim([0., plotWidth])
+ax1.set_xticks(list(np.linspace(0, plotWidth, plotWidth/100)))
+plt.grid(True)
 ax1.set_ylim([0,255])
+ax1.set_yticks(np.linspace(0,255,9))
+ax1.set_title('Beginning of buffer')
 plt.sca(ax1)
 plotLines1 = plt.plot(time[:plotWidth], data[:plotWidth])
 
 #### Axes 2 ####
 ax2 = fig.add_axes([.55,.4,.4,.2])
 ax2.set_xlim([RATE-plotWidth, RATE])
+#ax2.set_xticks(list(np.linspace(0, plotWidth, plotWidth/100)))
+plt.grid(True)
 #ax2.set_xlim([0, plotWidth])
 ax2.set_ylim([0,255])
+ax2.set_yticks(np.linspace(0,255,9))
+ax2.set_title('End of buffer')
 plt.sca(ax2)
 plotLines2 = plt.plot(time[RATE-plotWidth:RATE], data[RATE-plotWidth:RATE])
-
+dataSet = True
 
 # Keypress 'q' to quit
 def press(event):
