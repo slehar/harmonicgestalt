@@ -25,25 +25,6 @@ freq = 0.
 dataSet = False
 
     
-# PyAudio Callback - gets called repeatedly
-def paCallback(in_data, frame_count, time_info, status):
-    global data
-    if dataSet:
-        plotLines1[0].set_xdata(time[:plotWidth])
-        plotLines1[0].set_ydata(data[:plotWidth])
-        plotLines2[0].set_xdata(time[RATE-plotWidth:RATE])
-        plotLines2[0].set_ydata(data[RATE-plotWidth:RATE])
-    return (data, pyaudio.paContinue)
-
-# PyAudio open audio stream
-pa = pyaudio.PyAudio()
-stream = pa.open(
-            format = pa.get_format_from_width(1),
-            channels = 1,
-            rate = RATE,
-            output = True,
-            stream_callback=paCallback,
-            frames_per_buffer=CHUNK)
 
 fData = np.zeros(RATE, dtype=float)
 #for freq in [300, 400, 500]:
@@ -85,6 +66,26 @@ ax2.set_title('End of buffer')
 plt.sca(ax2)
 plotLines2 = plt.plot(time[RATE-plotWidth:RATE], data[RATE-plotWidth:RATE])
 dataSet = True
+
+# PyAudio Callback - gets called repeatedly
+def paCallback(in_data, frame_count, time_info, status):
+    global data
+    if dataSet:
+        plotLines1[0].set_xdata(time[:plotWidth])
+        plotLines1[0].set_ydata(data[:plotWidth])
+        plotLines2[0].set_xdata(time[RATE-plotWidth:RATE])
+        plotLines2[0].set_ydata(data[RATE-plotWidth:RATE])
+    return (data, pyaudio.paContinue)
+
+# PyAudio open audio stream
+pa = pyaudio.PyAudio()
+stream = pa.open(
+            format = pa.get_format_from_width(1),
+            channels = 1,
+            rate = RATE,
+            output = True,
+            stream_callback=paCallback,
+            frames_per_buffer=CHUNK)
 
 # Keypress 'q' to quit
 def press(event):
