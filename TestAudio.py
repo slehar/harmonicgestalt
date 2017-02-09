@@ -8,7 +8,7 @@ Created on Wed Jun  1 09:45:43 2016
 """
 
 import matplotlib.pyplot as plt
-#from   matplotlib.widgets import Slider
+from   matplotlib.widgets import Slider
 import numpy as np
 import pyaudio
 
@@ -87,28 +87,27 @@ def press(event):
         plt.close()
 fig.canvas.mpl_connect('key_press_event', press)
 
-#plt.ion()
 
 #  frequency slider
-#axSlider1 = fig.add_axes([0.3, 0.125, 0.234, 0.04])
-#axSlider1.set_xticks([])
-#axSlider1.set_yticks([])
-#slider1 = Slider(axSlider1, 'frequency', 100, 1000., valinit=300.)
-#freq = slider1.val
-#
-#def update1(val):
-#    global freq, data, fData, time
-#    freq = slider1.val
-#    fData = np.zeros(RATE, dtype=float)
-#    fData += np.sin(time*freq)
-#    fData = fData / np.max(np.abs(fData)) * 127 + 128
+axSlider1 = fig.add_axes([0.3, 0.125, 0.234, 0.04])
+axSlider1.set_xticks([])
+axSlider1.set_yticks([])
+slider1 = Slider(axSlider1, 'frequency', 100, 1000., valinit=300.)
+freq = slider1.val
+
+def update1(val):
+    global freq, data, fData, time
+    freq = slider1.val
+    fData = np.zeros(RATE, dtype=float)
+    fData += np.sin(time*freq)
+    fData = fData / np.max(np.abs(fData))
 #    lastTime = time[-1] + (time[-1] - time[-2])
 #    time = np.linspace(lastTime, lastTime+twoPi, RATE)
-#    plt.sca(ax)
-#    data = np.uint8(fData)
-#    plt.pause(.001)
-#    
-#slider1.on_changed(update1)
+#    plt.sca(ax1)
+    data = np.uint8(fData * 127 + 128)
+    plt.pause(.001)
+    
+slider1.on_changed(update1)
 
 
 # start the stream (4)
