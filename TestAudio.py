@@ -18,24 +18,16 @@ BASEFREQ  = 500      # base frequency Hz
 CHUNK     = 8192     # frames per buffer 
 plotWidth = 500
 twoPi = float(2.0*np.pi)
-data  = np.zeros(RATE, dtype=float)     # buffer of data
-time  = np.linspace(0, twoPi, RATE)     # time of data
-fData = np.sin(time)
-freq = 0.
 
 # Set time and data arrays    
-time  = np.linspace(0, twoPi, RATE)     # time 
+time  = np.linspace(0, twoPi, num=RATE)     # time 
 fData = np.zeros(RATE, dtype=float)     # data
-for freq in [300, 400, 500]:
-#for freq in [500]:
+for freq in [700, 800, 900]:
     fData += np.sin(time*freq)
-#    fData += np.sin(2.*np.pi*time*freq*int(40000/RATE))
-fData = fData / np.max(np.abs(fData)) * 127 + 128
-data = np.uint8(fData)
+fData = fData / np.max(np.abs(fData))
+iData = np.uint8(fData * 127. + 128.)
 #lastTime = time[-1] + (time[-1] - time[-2])
 lastTime = 0.
-time = np.linspace(lastTime, lastTime+RATE, RATE)
-
 
 ####### Open figure and set axes 1 for drawing Artists ########
 plt.close('all')
@@ -48,11 +40,11 @@ ax1 = fig.add_axes([.05,.4,.4,.2])
 ax1.set_xlim([0., plotWidth])
 ax1.set_xticks(list(np.linspace(0, plotWidth, plotWidth/100)))
 plt.grid(True)
-ax1.set_ylim([0,255])
-ax1.set_yticks(np.linspace(0,255,9))
+ax1.set_ylim([-2,2])
+ax1.set_yticks(np.linspace(-2,2,9))
 ax1.set_title('Beginning of buffer')
 plt.sca(ax1)
-plotLines1 = plt.plot(time[:plotWidth], data[:plotWidth])
+plotLines1 = ax1.plot(range(plotWidth), fData[:plotWidth])
 
 #### Axes 2 ####
 ax2 = fig.add_axes([.55,.4,.4,.2])
@@ -60,20 +52,20 @@ ax2.set_xlim([RATE-plotWidth, RATE])
 #ax2.set_xticks(list(np.linspace(0, plotWidth, plotWidth/100)))
 plt.grid(True)
 #ax2.set_xlim([0, plotWidth])
-ax2.set_ylim([0,255])
-ax2.set_yticks(np.linspace(0,255,9))
+ax2.set_ylim([-2,2])
+ax2.set_yticks(np.linspace(-2,2,9))
 ax2.set_title('End of buffer')
 plt.sca(ax2)
-plotLines2 = plt.plot(time[RATE-plotWidth:RATE], data[RATE-plotWidth:RATE])
+plotLines2 = ax2.plot(range(RATE, RATE-plotWidth, -1), fData[RATE-plotWidth:RATE])
 
 # PyAudio Callback - gets called repeatedly
 def paCallback(in_data, frame_count, time_info, status):
-    global data
-    plotLines1[0].set_xdata(time[:plotWidth])
-    plotLines1[0].set_ydata(data[:plotWidth])
-    plotLines2[0].set_xdata(time[RATE-plotWidth:RATE])
-    plotLines2[0].set_ydata(data[RATE-plotWidth:RATE])
-    return (data, pyaudio.paContinue)
+    global iData
+#    plotLines1[0].set_xdata(time[:plotWidth])
+#    plotLines1[0].set_ydata(fData[:plotWidth])
+#    plotLines2[0].set_xdata(time[RATE-plotWidth:RATE])
+#    plotLines2[0].set_ydata(fData[RATE-plotWidth:RATE])
+    return (iData, pyaudio.paContinue)
 
 # PyAudio open audio stream
 pa = pyaudio.PyAudio()
