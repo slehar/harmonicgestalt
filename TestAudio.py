@@ -61,10 +61,6 @@ plotLines2 = ax2.plot(range(RATE, RATE-plotWidth, -1), fData[RATE-plotWidth:RATE
 # PyAudio Callback - gets called repeatedly
 def paCallback(in_data, frame_count, time_info, status):
     global iData
-#    plotLines1[0].set_xdata(time[:plotWidth])
-#    plotLines1[0].set_ydata(fData[:plotWidth])
-#    plotLines2[0].set_xdata(time[RATE-plotWidth:RATE])
-#    plotLines2[0].set_ydata(fData[RATE-plotWidth:RATE])
     return (iData, pyaudio.paContinue)
 
 # PyAudio open audio stream
@@ -96,15 +92,15 @@ slider1 = Slider(axSlider1, 'frequency', 100, 1000., valinit=300.)
 freq = slider1.val
 
 def update1(val):
-    global freq, data, fData, time
-    freq = slider1.val
+    global freq, iData, fData, time
+    freq = float(int(slider1.val))
     fData = np.zeros(RATE, dtype=float)
     fData += np.sin(time*freq)
     fData = fData / np.max(np.abs(fData))
-#    lastTime = time[-1] + (time[-1] - time[-2])
-#    time = np.linspace(lastTime, lastTime+twoPi, RATE)
-#    plt.sca(ax1)
-    data = np.uint8(fData * 127 + 128)
+
+    plotLines1[0].set_ydata(fData[:plotWidth])
+    plotLines2[0].set_ydata(fData[RATE-plotWidth:RATE])
+    iData = np.uint8(fData * 127 + 128)
     plt.pause(.001)
     
 slider1.on_changed(update1)
