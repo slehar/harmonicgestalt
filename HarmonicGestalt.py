@@ -52,7 +52,7 @@ stream = pa.open(
 
 ######## Keyboard callback updatewave ########
 
-# Update Wave to be played based on current slider positions
+# Update Wave to be played based on current dot positions
 def updateWave():
     global data, fData, time, ptList, freqList, line
 
@@ -75,11 +75,9 @@ def updateWave():
                                         
     fData = np.zeros(CHUNK, dtype=float)
     for freq in freqList:
-        fData += np.sin(time*freq/10.)
+        iFreq = float(int(freq/10.))
+        fData += np.sin(time*iFreq)
     fData = fData / np.max(np.abs(fData)) * 127 + 128
-#    lastTime = time[-1] + (time[-1] - time[-2])
-#    time = np.linspace(lastTime, lastTime+twoPi, RATE)
-#    line.set_xdata(time[:100])
     yData = np.abs(np.fft.fft(fData[:PLOTWIDTH]))
     yData /= 100.
 #    yData /= yData.max()
@@ -103,8 +101,7 @@ ax.set_yticks([])
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05, .7, .15])
-#axSpect.set_xlim([0.,twoPi])
-axSpect.set_xlim([0.,twoPi])
+axSpect.set_xlim([-10., 10.])
 #axSpect.set_xticks([-500, 0, 500])
 #axSpect.set_ylim([0., 255.])
 axSpect.set_ylim([0., 1000.])
