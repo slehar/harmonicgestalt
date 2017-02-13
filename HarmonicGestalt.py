@@ -16,11 +16,11 @@ import pyaudio
 ptRad     = .01      # Radius of points
 RATE      = 44100    # bytes per second data rate
 BASEFREQ  = 500      # base frequency Hz
-CHUNK     = 8192     # frames per buffer 
+CHUNK     = 4410     # frames per buffer 
 PLOTWIDTH = 512      # Width of plot trace
 twoPi = float(2.0*np.pi)
-data  = np.zeros(RATE, dtype=float)     # buffer of data
-time  = np.linspace(0, twoPi, RATE)     # time of data
+data  = np.zeros(CHUNK, dtype=float)     # buffer of data
+time  = np.linspace(0, twoPi, CHUNK)     # time of data
 fData = np.sin(time)
 #plotTime = np.linspace(0, twoPi, num=PLOTWIDTH)
 plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
@@ -58,7 +58,7 @@ def updateWave():
 
     freqList = []
     if len(ptList) < 2:
-        fData = np.zeros(RATE, dtype=float)
+        fData = np.zeros(CHUNK, dtype=float)
         data = np.uint8(fData)
         return
     elif len(ptList) == 2:
@@ -73,12 +73,12 @@ def updateWave():
                                    (point1['yPos'] - point2['yPos'])**2.)
                     freqList.append(int(BASEFREQ/dist))
                                         
-    fData = np.zeros(RATE, dtype=float)
+    fData = np.zeros(CHUNK, dtype=float)
     for freq in freqList:
-        fData += np.sin(time*freq)
+        fData += np.sin(time*freq/10.)
     fData = fData / np.max(np.abs(fData)) * 127 + 128
-    lastTime = time[-1] + (time[-1] - time[-2])
-    time = np.linspace(lastTime, lastTime+twoPi, RATE)
+#    lastTime = time[-1] + (time[-1] - time[-2])
+#    time = np.linspace(lastTime, lastTime+twoPi, RATE)
 #    line.set_xdata(time[:100])
     yData = np.abs(np.fft.fft(fData[:PLOTWIDTH]))
     yData /= 100.
@@ -125,7 +125,6 @@ axSl2.set_yticks([])
 # Keypress 'q' to quit
 def press(event):
     global ptList, data
-    sys.stdout.flush()
     if event.key == 'q':
         stream.stop_stream()
         stream.close()
