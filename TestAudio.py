@@ -16,7 +16,7 @@ import pyaudio
 RATE      = 44100    # bytes per second data rate
 BASEFREQ  = 500      # base frequency Hz
 #CHUNK     = 8192     # frames per buffer 
-CHUNK     = 4410     # audio buffsize   
+CHUNK     = 4410     # audio buffsize (records 1/10 sec of sound)  
 plotWidth = 500
 twoPi = float(2.0*np.pi)
 
@@ -96,9 +96,9 @@ freq = slider1.val/10.
 def update1(val):
     global freq, iData, fData, time
     freq = slider1.val/10.
-    iFreq = freq / 10.
+    iFreq = float(int(freq))
     fData = np.zeros(CHUNK, dtype=float)
-    fData += np.sin(time*freq)
+    fData += np.sin(time*iFreq)
     fData = fData / np.max(np.abs(fData))
 
     plotLines1[0].set_ydata(fData[:plotWidth])
