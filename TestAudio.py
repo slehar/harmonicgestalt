@@ -15,15 +15,16 @@ import pyaudio
 # global variables
 RATE      = 44100    # bytes per second data rate
 BASEFREQ  = 500      # base frequency Hz
-CHUNK     = 8192     # frames per buffer 
+#CHUNK     = 8192     # frames per buffer 
+CHUNK     = 4410     # audio buffsize   
 plotWidth = 500
 twoPi = float(2.0*np.pi)
 
 # Set time and data arrays    
-time  = np.linspace(0, twoPi, num=RATE)     # time 
-fData = np.zeros(RATE, dtype=float)     # data
+time  = np.linspace(0, twoPi, num=CHUNK)     # time 
+fData = np.zeros(CHUNK, dtype=float)     # data
 for freq in [700, 800, 900]:
-    fData += np.sin(time*freq)
+    fData += np.sin(time*freq/10.)
 fData = fData / np.max(np.abs(fData))
 iData = np.uint8(fData * 127. + 128.)
 #lastTime = time[-1] + (time[-1] - time[-2])
@@ -48,7 +49,7 @@ plotLines1 = ax1.plot(range(plotWidth), fData[:plotWidth])
 
 #### Axes 2 ####
 ax2 = fig.add_axes([.55,.4,.4,.2])
-ax2.set_xlim([RATE-plotWidth, RATE])
+ax2.set_xlim([CHUNK-plotWidth, CHUNK])
 #ax2.set_xticks(list(np.linspace(0, plotWidth, plotWidth/100)))
 plt.grid(True)
 #ax2.set_xlim([0, plotWidth])
@@ -56,7 +57,7 @@ ax2.set_ylim([-2,2])
 ax2.set_yticks(np.linspace(-2,2,9))
 ax2.set_title('End of buffer')
 plt.sca(ax2)
-plotLines2 = ax2.plot(range(RATE, RATE-plotWidth, -1), fData[RATE-plotWidth:RATE])
+plotLines2 = ax2.plot(range(CHUNK, CHUNK-plotWidth, -1), fData[CHUNK-plotWidth:CHUNK])
 
 # PyAudio Callback - gets called repeatedly
 def paCallback(in_data, frame_count, time_info, status):
@@ -88,18 +89,20 @@ fig.canvas.mpl_connect('key_press_event', press)
 axSlider1 = fig.add_axes([0.3, 0.125, 0.234, 0.04])
 axSlider1.set_xticks([])
 axSlider1.set_yticks([])
-slider1 = Slider(axSlider1, 'frequency', 100, 1000., valinit=300.)
-freq = slider1.val
+slider1 = Slider(axSlider1, 'frequency', 100, 1000.,
+                 valinit=700., valfmt='%0.0f')
+freq = slider1.val/10.
 
 def update1(val):
     global freq, iData, fData, time
-    freq = float(int(slider1.val))
-    fData = np.zeros(RATE, dtype=float)
+    freq = slider1.val/10.
+    iFreq = freq / 10.
+    fData = np.zeros(CHUNK, dtype=float)
     fData += np.sin(time*freq)
     fData = fData / np.max(np.abs(fData))
 
     plotLines1[0].set_ydata(fData[:plotWidth])
-    plotLines2[0].set_ydata(fData[RATE-plotWidth:RATE])
+    plotLines2[0].set_ydata(fData[CHUNK-plotWidth:CHUNK])
     iData = np.uint8(fData * 127 + 128)
     plt.pause(.001)
     
