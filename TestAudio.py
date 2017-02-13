@@ -85,20 +85,36 @@ def press(event):
 fig.canvas.mpl_connect('key_press_event', press)
 
 
-#  frequency slider
-axSlider1 = fig.add_axes([0.3, 0.125, 0.234, 0.04])
+#  frequency sliders
+axSlider1 = fig.add_axes([0.3, 0.325, 0.234, 0.04])
 axSlider1.set_xticks([])
 axSlider1.set_yticks([])
-slider1 = Slider(axSlider1, 'frequency', 100, 1000.,
-                 valinit=700., valfmt='%0.0f')
-freq = slider1.val/10.
 
-def update1(val):
-    global freq, iData, fData, time
-    freq = slider1.val/10.
-    iFreq = float(int(freq))
+axSlider2 = fig.add_axes([0.3, 0.225, 0.234, 0.04])
+axSlider2.set_xticks([])
+axSlider2.set_yticks([])
+
+axSlider3 = fig.add_axes([0.3, 0.125, 0.234, 0.04])
+axSlider3.set_xticks([])
+axSlider3.set_yticks([])
+
+
+slider1 = Slider(axSlider1, 'frequency1', 100, 1000.,
+                 valinit=700., valfmt='%0.0f')
+freq1 = slider1.val/10.
+slider2 = Slider(axSlider2, 'frequency2', 100, 1000.,
+                 valinit=800., valfmt='%0.0f')
+freq2 = slider2.val/10.
+slider3 = Slider(axSlider3, 'frequency3', 100, 1000.,
+                 valinit=900., valfmt='%0.0f')
+freq3 = slider3.val/10.
+
+def update(val):
+    global iData
     fData = np.zeros(CHUNK, dtype=float)
-    fData += np.sin(time*iFreq)
+    for freq in [freq1, freq2, freq3]:
+        iFreq = float(int(freq))
+        fData += np.sin(time*iFreq)
     fData = fData / np.max(np.abs(fData))
 
     plotLines1[0].set_ydata(fData[:plotWidth])
@@ -106,7 +122,24 @@ def update1(val):
     iData = np.uint8(fData * 127 + 128)
     plt.pause(.001)
     
+
+def update1(val):
+    global freq1, iData, fData, time
+    freq1 = slider1.val/10.
+    update(1)
 slider1.on_changed(update1)
+
+def update2(val):
+    global freq2, iData, fData, time
+    freq2 = slider2.val/10.
+    update(1)
+slider2.on_changed(update2)
+
+def update3(val):
+    global freq3, iData, fData, time
+    freq3 = slider3.val/10.
+    update(1)
+slider3.on_changed(update3)
 
 
 # start the stream (4)
