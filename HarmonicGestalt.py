@@ -101,13 +101,14 @@ ax.set_yticks([])
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05, .7, .15])
-axSpect.set_xlim([-10., 10.])
+axSpect.set_xlim([-3., 3.])
 #axSpect.set_xticks([-500, 0, 500])
 #axSpect.set_ylim([0., 255.])
 axSpect.set_ylim([0., 1000.])
 #axSpect.set_yticks(['0', '500', '1000'])
 #line, = axSpect.plot(plotTime, plotData)
-line, = axSpect.semilogy(plotTime, plotData)
+plotFreq = plotTime - np.pi
+line, = axSpect.semilogy(plotFreq, plotData)
 axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 
 
