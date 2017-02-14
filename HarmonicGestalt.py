@@ -24,7 +24,8 @@ time  = np.linspace(0, twoPi, CHUNK)     # time of data
 fData = np.sin(time)
 #plotTime = np.linspace(0, twoPi, num=PLOTWIDTH)
 plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
-plotData = np.sin(plotTime) * 128 + 127
+#plotData = np.sin(plotTime) * 128 + 127
+plotData = np.zeros_like(plotTime)
 
 ptList = []
 ptList.append({'xPos':.5, 'yPos':.5, 'selected':False})
