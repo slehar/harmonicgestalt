@@ -107,7 +107,7 @@ axStim.set_xticks([])
 axStim.set_yticks([])
 axStim.set_title('Stimulus')
 
-#### Percept Axes #### (just to add 2d border around 3d window)
+#### Percept Axes #### (just to add 2d border around 3d Axes)
 ax0 = fig.add_axes([.55,.2,.4,.4*winAspect])
 ax0.axes.set_xticks([])
 ax0.axes.set_yticks([])
@@ -141,6 +141,11 @@ poly2.set_alpha(0.7)
 poly2.set_color('w')
 poly2.set_edgecolor('k')
 ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
+
+#### z-rod ####
+ax3d.plot([ptList[0]['xPos'], ptList[0]['xPos']], 
+          [ptList[0]['yPos'], ptList[0]['yPos']], 
+          [-1, 1], zdir='y')
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05/winAspect, .7/winAspect, .15])
