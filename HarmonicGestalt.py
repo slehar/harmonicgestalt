@@ -7,10 +7,15 @@ Created on Wed Jun  1 09:45:43 2016
 @author: slehar
 """
 
+from mpl_toolkits.mplot3d import Axes3D # Required only for its side-effect
+#del Axes3D      # to allow "projection='3d'", thus deleted because unused
+from matplotlib.collections import PolyCollection
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
 import pyaudio
+
+plt.rcParams['image.cmap'] = 'gray' 
 
 # global variables
 ptRad     = .01      # Radius of points
@@ -90,18 +95,20 @@ def updateWave():
 
 
 ####### Open figure and set axes 1 for drawing Artists ########
+figYSize, figXSize = (15,8)
+winAspect = float(figYSize)/float(figXSize)
 plt.close('all')
-fig = plt.figure(figsize=(10,8))
+fig = plt.figure(figsize=(figYSize,figXSize))
 aspect = 10./8.
 fig.canvas.set_window_title('Harmonic Gestalt')
 
 #### Main axes ####
-ax = fig.add_axes([.1, .225, .7, .75])
+ax = fig.add_axes([.1, .4/winAspect, .7/winAspect, .75])
 ax.set_xticks([])
 ax.set_yticks([])
 
 #### Axes for spectrum ####
-axSpect = fig.add_axes([.1, .05, .7, .15])
+axSpect = fig.add_axes([.1, .05/winAspect, .7/winAspect, .15])
 axSpect.set_xlim([-3., 3.])
 #axSpect.set_xticks([-500, 0, 500])
 #axSpect.set_ylim([0., 255.])
