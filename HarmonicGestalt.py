@@ -149,9 +149,8 @@ ax3d.plot([ptList[0]['xPos'], ptList[0]['xPos']],
           [ptList[0]['yPos'], ptList[0]['yPos']], [-1, 1], color='gray', zdir='y')
          
 #### z-bead ####
-#ax3d.scatter([ptList[0]['yPos'], ptList[0]['yPos']], 
-#          [ptList[0]['xPos'], ptList[0]['xPos']], 
-#          [-1, 1], zdir='y', color='gray')
+ax3d.scatter([ptList[0]['xPos']], [ptList[0]['xPos']], 
+             [0.], zdir='y', color='gray')
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05/winAspect, .7/winAspect, .15])
