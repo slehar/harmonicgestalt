@@ -33,12 +33,12 @@ plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
 plotData = np.zeros_like(plotTime)
 
 ptList = []
-ptList.append({'xPos':.5, 'yPos':.5, 'selected':False})
+ptList.append({'xPos':0., 'yPos':0., 'selected':False})
 selectedPt = None
 freqList = []
 
 buttonState = False
-xdata, ydata = .5, .5
+xdata, ydata = 0., 0.
 
     
 # PyAudio Callback - gets called repeatedly
@@ -103,8 +103,10 @@ fig.canvas.set_window_title('Harmonic Gestalt')
 
 #### Stimulus axes ####
 axStim = fig.add_axes([.1, .4/winAspect, .7/winAspect, .75])
-axStim.set_xticks([])
-axStim.set_yticks([])
+#axStim.set_xticks([])
+#axStim.set_yticks([])
+axStim.set_xlim([-1,1])
+axStim.set_ylim([-1,1])
 axStim.set_title('Stimulus')
 
 #### Percept Axes #### (just to add 2d border around 3d Axes)
@@ -143,8 +145,8 @@ poly2.set_edgecolor('k')
 ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 
 #### z-rod ####
-ax3d.plot([ptList[0]['xPos'], ptList[0]['xPos']], 
-          [ptList[0]['yPos'], ptList[0]['yPos']], 
+ax3d.plot([ptList[0]['yPos'], ptList[0]['yPos']], 
+          [ptList[0]['xPos'], ptList[0]['xPos']], 
           [-1, 1], zdir='y', color='gray')
 
 #### Axes for spectrum ####
@@ -171,6 +173,10 @@ def press(event):
         stream.close()
         pa.terminate()
         plt.close()
+    elif event.key == 'm':
+        stream.stop_stream()
+        stream.close()
+        pa.terminate()
     elif event.key == 'backspace':
         if len(ptList) > 0:
             lastPt = ptList.pop()
@@ -183,6 +189,7 @@ def on_press(event):
     global buttonState, selectedPt
     if event.inaxes is not axStim:
         return
+    print 'event pos %5.2f, %5.2f'%(event.xdata,event.ydata)
     inAPoint = False
     for pt in ptList:
         contains, attrd = pt['circle'].contains(event)
@@ -202,14 +209,14 @@ def on_press(event):
     if not inAPoint:
         xdata = event.xdata
         ydata = event.ydata
-        circ = mpatches.Circle((xdata, ydata), ptRad)
+        circ = mpatches.Circle((ydata, xdata), ptRad)
         axStim.add_patch(circ)
         ptList.append({'xPos':xdata,
                        'yPos':ydata,
                        'selected':True,
                        'circle':circ})
         ax3d.plot([ptList[-1]['xPos'], ptList[-1]['xPos']], 
-                  [ptList[-1]['yPos'], ptList[-1]['yPos']], 
+                  [-ptList[-1]['yPos'], -ptList[-1]['yPos']], 
                   [-1, 1], zdir='y', color='gray')
         selectedPt = ptList[-1]
         updateWave()
@@ -245,7 +252,8 @@ def on_motion(event):
         fig.canvas.draw()
         updateWave()
    	   
-    
+
+# Plot zeroth point    
 ptList[0]['circle'] = mpatches.Circle((xdata, ydata), ptRad)
 axStim.add_patch(ptList[0]['circle'])
 
