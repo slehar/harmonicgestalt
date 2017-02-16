@@ -73,7 +73,6 @@ poly2.set_color('w')
 poly2.set_edgecolor('k')
 ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 
-
 plt.show()
 
 # Pop fig window to top]]

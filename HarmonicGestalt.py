@@ -145,7 +145,7 @@ ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 #### z-rod ####
 ax3d.plot([ptList[0]['xPos'], ptList[0]['xPos']], 
           [ptList[0]['yPos'], ptList[0]['yPos']], 
-          [-1, 1], zdir='y')
+          [-1, 1], zdir='y', color='gray')
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05/winAspect, .7/winAspect, .15])
@@ -208,6 +208,9 @@ def on_press(event):
                        'yPos':ydata,
                        'selected':True,
                        'circle':circ})
+        ax3d.plot([ptList[-1]['xPos'], ptList[-1]['xPos']], 
+                  [ptList[-1]['yPos'], ptList[-1]['yPos']], 
+                  [-1, 1], zdir='y', color='gray')
         selectedPt = ptList[-1]
         updateWave()
 
