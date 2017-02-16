@@ -99,34 +99,64 @@ figYSize, figXSize = (15,8)
 winAspect = float(figYSize)/float(figXSize)
 plt.close('all')
 fig = plt.figure(figsize=(figYSize,figXSize))
-aspect = 10./8.
 fig.canvas.set_window_title('Harmonic Gestalt')
 
-#### Main axes ####
-ax = fig.add_axes([.1, .4/winAspect, .7/winAspect, .75])
-ax.set_xticks([])
-ax.set_yticks([])
+#### Stimulus axes ####
+axStim = fig.add_axes([.1, .4/winAspect, .7/winAspect, .75])
+axStim.set_xticks([])
+axStim.set_yticks([])
+axStim.set_title('Stimulus')
+
+#### Percept Axes #### (just to add 2d border around 3d window)
+ax0 = fig.add_axes([.55,.2,.4,.4*winAspect])
+ax0.axes.set_xticks([])
+ax0.axes.set_yticks([])
+ax0.set_title('Percept')
+
+#### 3D Axes ####
+ax3d = fig.add_axes([.57,.22,.38,.38*winAspect], projection='3d')
+ax3d.set_xlabel('X')
+ax3d.set_ylabel('Z') # swap Y and Z
+ax3d.set_zlabel('Y')
+ax3d.set_xlim3d(-1, 1)
+ax3d.set_ylim3d(-1, 1)
+ax3d.set_zlim3d(1, -1)
+
+# Back plane
+verts3D = np.array([[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[-1,-1,1]])
+vertsXY = [verts3D[:,:2]]
+vertsZ  = verts3D[:,2]
+poly1 = PolyCollection(vertsXY)
+poly1.set_alpha(0.7)
+poly1.set_color('w')
+poly1.set_edgecolor('k')
+ax3d.add_collection3d(poly1, zs=vertsZ, zdir='y')
+
+# Front plane
+verts3D = np.array([[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,-1]])
+vertsXY = [verts3D[:,:2]]
+vertsZ  = verts3D[:,2]
+poly2 = PolyCollection(vertsXY)
+poly2.set_alpha(0.7)
+poly2.set_color('w')
+poly2.set_edgecolor('k')
+ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05/winAspect, .7/winAspect, .15])
 axSpect.set_xlim([-3., 3.])
-#axSpect.set_xticks([-500, 0, 500])
-#axSpect.set_ylim([0., 255.])
 axSpect.set_ylim([0., 1000.])
-#axSpect.set_yticks(['0', '500', '1000'])
-#line, = axSpect.plot(plotTime, plotData)
 plotFreq = plotTime - np.pi
 line, = axSpect.semilogy(plotFreq, plotData)
 axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 
-
 #### Axes for sliders ####
-axSl1 = fig.add_axes([.825, .7, .05, .275])
-axSl1.set_xticks([])
-axSl1.set_yticks([])
-axSl2 = fig.add_axes([.92, .7, .05, .275])
-axSl2.set_xticks([])
-axSl2.set_yticks([])
+#axSl1 = fig.add_axes([.825, .7, .05, .275])
+#axSl1.set_xticks([])
+#axSl1.set_yticks([])
+#axSl2 = fig.add_axes([.92, .7, .05, .275])
+#axSl2.set_xticks([])
+#axSl2.set_yticks([])
 
 # Keypress 'q' to quit
 def press(event):
@@ -146,7 +176,8 @@ def press(event):
 ########################
 def on_press(event):
     global buttonState, selectedPt
-#    print 'In on_press()'
+    if event.inaxes is not axStim:
+        return
     inAPoint = False
     for pt in ptList:
         contains, attrd = pt['circle'].contains(event)
@@ -167,7 +198,7 @@ def on_press(event):
         xdata = event.xdata
         ydata = event.ydata
         circ = mpatches.Circle((xdata, ydata), ptRad)
-        ax.add_patch(circ)
+        axStim.add_patch(circ)
         ptList.append({'xPos':xdata,
                        'yPos':ydata,
                        'selected':True,
@@ -208,7 +239,9 @@ def on_motion(event):
    	   
     
 ptList[0]['circle'] = mpatches.Circle((xdata, ydata), ptRad)
-ax.add_patch(ptList[0]['circle'])
+axStim.add_patch(ptList[0]['circle'])
+
+plt.sca(axStim)
 
 # Connect fig to events
 fig.canvas.mpl_connect('button_press_event',    on_press)
@@ -221,7 +254,7 @@ fig.canvas.mpl_connect('key_press_event',       press)
 #updateWave()
 
 # start the stream (4)
-stream.start_stream()
+#stream.start_stream()
 
 # Show plot
 plt.show()
