@@ -152,7 +152,7 @@ ptList[0]['rod'] = ax3d.plot([ptList[0]['xPos'], ptList[0]['xPos']],
          
 #### z-bead ####
 ptList[0]['bead'] = ax3d.scatter([ptList[0]['xPos']], [ptList[0]['xPos']], 
-                                 [0.], zdir='y', color='gray')
+                                 [0.], zdir='y', color='blue')
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05/winAspect, .7/winAspect, .15])
