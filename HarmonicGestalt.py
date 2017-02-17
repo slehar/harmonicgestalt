@@ -13,6 +13,7 @@ from matplotlib.collections import PolyCollection
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
+from   matplotlib.widgets import Slider
 import pyaudio
 
 plt.rcParams['image.cmap'] = 'gray' 
@@ -162,12 +163,18 @@ line, = axSpect.semilogy(plotFreq, plotData)
 axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 
 #### Axes for sliders ####
-axSl1 = fig.add_axes([.6, .15, .6/winAspect, .02])
-axSl1.set_xticks([])
-axSl1.set_yticks([])
-#axSl2 = fig.add_axes([.92, .7, .05, .275])
-#axSl2.set_xticks([])
-#axSl2.set_yticks([])
+axSl0 = fig.add_axes([.6, .15, .6/winAspect, .02])
+axSl0.set_xticks([])
+axSl0.set_yticks([])
+slider0 = Slider(axSl0, '0', -1., 1., valinit=0.)
+ptList[0]['depth'] = slider0.val
+
+def update0(val):
+    depth = slider0.val
+    print 'depth = %5.2f'%depth
+#    ptList[0]['bead']
+slider0.on_changed(update0)
+
 
 # Keypress 'q' to quit
 def press(event):
