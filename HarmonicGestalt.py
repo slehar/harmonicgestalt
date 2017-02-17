@@ -260,6 +260,10 @@ def on_motion(event):
         selectedPt['circle'].center = (xdata, ydata)
         selectedPt['xPos'] = xdata
         selectedPt['yPos'] = ydata
+        ptList[0]['rod'][0].set_xdata([xdata, xdata])
+        ptList[0]['rod'][0].set_ydata([ydata, ydata])
+        ptList[0]['rod'][0].set_3d_properties([-1, 1], zdir='y')
+        plt.pause(.001)
         fig.canvas.draw()
         updateWave()
    	   
