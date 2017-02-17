@@ -171,6 +171,7 @@ ptList[0]['depth'] = slider0.val
 
 def update0(val):
     depth = slider0.val
+    ptList[0]['depth'] = depth
     ptList[0]['bead'].set_3d_properties(depth, zdir='y')
 #    ptList[0]['bead']
 slider0.on_changed(update0)
