@@ -7,16 +7,10 @@ Created on Wed Jun  1 09:45:43 2016
 @author: slehar
 """
 
-from mpl_toolkits.mplot3d import Axes3D # Required only for its side-effect
-#del Axes3D      # to allow "projection='3d'", thus deleted because unused
-from matplotlib.collections import PolyCollection
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
-from   matplotlib.widgets import Slider
 import pyaudio
-
-plt.rcParams['image.cmap'] = 'gray' 
 
 # global variables
 ptRad     = .01      # Radius of points
@@ -34,12 +28,12 @@ plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
 plotData = np.zeros_like(plotTime)
 
 ptList = []
-ptList.append({'xPos':0., 'yPos':0., 'selected':False})
+ptList.append({'xPos':.5, 'yPos':.5, 'selected':False})
 selectedPt = None
 freqList = []
 
 buttonState = False
-xdata, ydata = 0., 0.
+xdata, ydata = .5, .5
 
     
 # PyAudio Callback - gets called repeatedly
@@ -96,86 +90,36 @@ def updateWave():
 
 
 ####### Open figure and set axes 1 for drawing Artists ########
-figYSize, figXSize = (15,8)
-winAspect = float(figYSize)/float(figXSize)
 plt.close('all')
-fig = plt.figure(figsize=(figYSize,figXSize))
+fig = plt.figure(figsize=(10,8))
+aspect = 10./8.
 fig.canvas.set_window_title('Harmonic Gestalt')
 
-#### Stimulus axes ####
-axStim = fig.add_axes([.1, .4/winAspect, .7/winAspect, .75])
-#axStim.set_xticks([])
-#axStim.set_yticks([])
-axStim.set_xlim([-1,1])
-axStim.set_ylim([-1,1])
-axStim.set_title('Stimulus')
-
-#### Percept Axes #### (just to add 2d border around 3d Axes)
-ax0 = fig.add_axes([.55,.2,.4,.4*winAspect])
-ax0.axes.set_xticks([])
-ax0.axes.set_yticks([])
-ax0.set_title('Percept')
-
-#### 3D Axes ####
-ax3d = fig.add_axes([.57,.22,.38,.38*winAspect], projection='3d')
-ax3d.set_xlabel('X')
-ax3d.set_ylabel('Z') # swap Y and Z
-ax3d.set_zlabel('Y')
-ax3d.set_xlim3d(-1, 1)
-ax3d.set_ylim3d(-1, 1)
-ax3d.set_zlim3d(1, -1)
-
-# Back plane
-verts3D = np.array([[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[-1,-1,1]])
-vertsXY = [verts3D[:,:2]]
-vertsZ  = verts3D[:,2]
-poly1 = PolyCollection(vertsXY)
-poly1.set_alpha(0.7)
-poly1.set_color('w')
-poly1.set_edgecolor('k')
-ax3d.add_collection3d(poly1, zs=vertsZ, zdir='y')
-
-# Front plane
-verts3D = np.array([[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,-1]])
-vertsXY = [verts3D[:,:2]]
-vertsZ  = verts3D[:,2]
-poly2 = PolyCollection(vertsXY)
-poly2.set_alpha(0.7)
-poly2.set_color('w')
-poly2.set_edgecolor('k')
-ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
-
-#### z-rod ####
-ptList[0]['rod'] = ax3d.plot([ptList[0]['xPos'], ptList[0]['xPos']], 
-                             [ptList[0]['yPos'], ptList[0]['yPos']], 
-                             [-1, 1], color='gray', zdir='y')
-         
-#### z-bead ####
-ptList[0]['bead'] = ax3d.scatter([ptList[0]['xPos']], [ptList[0]['xPos']], 
-                                 [0.], zdir='y', color='blue')
+#### Main axes ####
+ax = fig.add_axes([.1, .225, .7, .75])
+ax.set_xticks([])
+ax.set_yticks([])
 
 #### Axes for spectrum ####
-axSpect = fig.add_axes([.1, .05/winAspect, .7/winAspect, .15])
+axSpect = fig.add_axes([.1, .05, .7, .15])
 axSpect.set_xlim([-3., 3.])
+#axSpect.set_xticks([-500, 0, 500])
+#axSpect.set_ylim([0., 255.])
 axSpect.set_ylim([0., 1000.])
+#axSpect.set_yticks(['0', '500', '1000'])
+#line, = axSpect.plot(plotTime, plotData)
 plotFreq = plotTime - np.pi
 line, = axSpect.semilogy(plotFreq, plotData)
 axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 
+
 #### Axes for sliders ####
-axSl0 = fig.add_axes([.6, .15, .6/winAspect, .02])
-axSl0.set_xticks([])
-axSl0.set_yticks([])
-slider0 = Slider(axSl0, '0', -1., 1., valinit=0.)
-ptList[0]['depth'] = slider0.val
-
-def update0(val):
-    depth = slider0.val
-    ptList[0]['depth'] = depth
-    ptList[0]['bead'].set_3d_properties(depth, zdir='y')
-#    ptList[0]['bead']
-slider0.on_changed(update0)
-
+axSl1 = fig.add_axes([.825, .7, .05, .275])
+axSl1.set_xticks([])
+axSl1.set_yticks([])
+axSl2 = fig.add_axes([.92, .7, .05, .275])
+axSl2.set_xticks([])
+axSl2.set_yticks([])
 
 # Keypress 'q' to quit
 def press(event):
@@ -185,10 +129,6 @@ def press(event):
         stream.close()
         pa.terminate()
         plt.close()
-    elif event.key == 'm':
-        stream.stop_stream()
-        stream.close()
-        pa.terminate()
     elif event.key == 'backspace':
         if len(ptList) > 0:
             lastPt = ptList.pop()
@@ -199,9 +139,7 @@ def press(event):
 ########################
 def on_press(event):
     global buttonState, selectedPt
-    if event.inaxes is not axStim:
-        return
-    print 'event pos %5.2f, %5.2f'%(event.xdata,event.ydata)
+#    print 'In on_press()'
     inAPoint = False
     for pt in ptList:
         contains, attrd = pt['circle'].contains(event)
@@ -221,15 +159,12 @@ def on_press(event):
     if not inAPoint:
         xdata = event.xdata
         ydata = event.ydata
-        circ = mpatches.Circle((ydata, xdata), ptRad)
-        axStim.add_patch(circ)
+        circ = mpatches.Circle((xdata, ydata), ptRad)
+        ax.add_patch(circ)
         ptList.append({'xPos':xdata,
                        'yPos':ydata,
                        'selected':True,
                        'circle':circ})
-        ax3d.plot([ptList[-1]['xPos'], ptList[-1]['xPos']], 
-                  [-ptList[-1]['yPos'], -ptList[-1]['yPos']], 
-                  [-1, 1], zdir='y', color='gray')
         selectedPt = ptList[-1]
         updateWave()
 
@@ -261,21 +196,12 @@ def on_motion(event):
         selectedPt['circle'].center = (xdata, ydata)
         selectedPt['xPos'] = xdata
         selectedPt['yPos'] = ydata
-        ptList[0]['rod'][0].set_xdata([xdata, xdata])
-        ptList[0]['rod'][0].set_ydata([-ydata, -ydata])
-        ptList[0]['rod'][0].set_3d_properties([-1, 1], zdir='y')
-        ptList[0]['bead'].set_offsets([xdata, -ydata])
-        ptList[0]['bead'].set_3d_properties(ptList[0]['depth'], zdir='y')
-        plt.pause(.001)
         fig.canvas.draw()
         updateWave()
    	   
-
-# Plot zeroth point    
+    
 ptList[0]['circle'] = mpatches.Circle((xdata, ydata), ptRad)
-axStim.add_patch(ptList[0]['circle'])
-
-plt.sca(axStim)
+ax.add_patch(ptList[0]['circle'])
 
 # Connect fig to events
 fig.canvas.mpl_connect('button_press_event',    on_press)
@@ -288,7 +214,7 @@ fig.canvas.mpl_connect('key_press_event',       press)
 #updateWave()
 
 # start the stream (4)
-#stream.start_stream()
+stream.start_stream()
 
 # Show plot
 plt.show()
