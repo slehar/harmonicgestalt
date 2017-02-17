@@ -263,6 +263,8 @@ def on_motion(event):
         ptList[0]['rod'][0].set_xdata([xdata, xdata])
         ptList[0]['rod'][0].set_ydata([-ydata, -ydata])
         ptList[0]['rod'][0].set_3d_properties([-1, 1], zdir='y')
+        ptList[0]['bead'].set_offsets([xdata, -ydata])
+        ptList[0]['bead'].set_3d_properties(ptList[0]['depth'], zdir='y')
         plt.pause(.001)
         fig.canvas.draw()
         updateWave()
