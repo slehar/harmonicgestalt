@@ -34,10 +34,8 @@ plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
 plotData = np.zeros_like(plotTime)
 
 ptList = []
-ptList.append({'xPos':0., 'yPos':0., 'selected':False})
 selectedPt = None
 freqList = []
-
 buttonState = False
 xdata, ydata = 0., 0.
 
@@ -145,14 +143,14 @@ poly2.set_color('w')
 poly2.set_edgecolor('k')
 ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 
-#### z-rod ####
-ptList[0]['rod'] = ax3d.plot([ptList[0]['xPos'], ptList[0]['xPos']], 
-                             [ptList[0]['yPos'], ptList[0]['yPos']], 
-                             [-1, 1], color='gray', zdir='y')
-         
-#### z-bead ####
-ptList[0]['bead'] = ax3d.scatter([ptList[0]['xPos']], [ptList[0]['xPos']], 
-                                 [0.], zdir='y', color='blue')
+# Create zeroth point
+# Plot zeroth point    
+circle = mpatches.Circle((0., 0.), ptRad)
+axStim.add_patch(circle)
+rod = ax3d.plot([0., 0.], [0., 0.], [-1, 1], color='gray', zdir='y')
+bead = ax3d.scatter([0.], [0.], [0.], zdir='y', color='blue')
+ptList.append({'xPos':0., 'yPos':0., 'selected':False,'circle':circle, 
+               'rod':rod, 'bead':bead, 'depth':0.})
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05/winAspect, .7/winAspect, .15])
@@ -170,6 +168,7 @@ slider0 = Slider(axSl0, '0', -1., 1., valinit=0.)
 ptList[0]['depth'] = slider0.val
 
 def update0(val):
+    print 'val = %r'%val
     depth = slider0.val
     ptList[0]['depth'] = depth
     ptList[0]['bead'].set_offsets([ptList[0]['xPos'], -ptList[0]['yPos']])
@@ -283,9 +282,6 @@ def on_motion(event):
         updateWave()
    	   
 
-# Plot zeroth point    
-ptList[0]['circle'] = mpatches.Circle((xdata, ydata), ptRad)
-axStim.add_patch(ptList[0]['circle'])
 
 plt.sca(axStim)
 
@@ -295,12 +291,6 @@ fig.canvas.mpl_connect('button_release_event',  on_release)
 fig.canvas.mpl_connect('motion_notify_event',   on_motion)
 fig.canvas.mpl_connect('key_press_event',       press)
 
-
-# Initial update of wave
-#updateWave()
-
-# start the stream (4)
-#stream.start_stream()
 
 # Show plot
 plt.show()
