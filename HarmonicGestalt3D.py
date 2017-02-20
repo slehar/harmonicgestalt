@@ -172,8 +172,9 @@ ptList[0]['depth'] = slider0.val
 def update0(val):
     depth = slider0.val
     ptList[0]['depth'] = depth
+    ptList[0]['bead'].set_offsets([ptList[0]['xPos'], -ptList[0]['yPos']])
     ptList[0]['bead'].set_3d_properties(depth, zdir='y')
-#    ptList[0]['bead']
+    plt.show()
 slider0.on_changed(update0)
 
 
