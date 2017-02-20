@@ -201,7 +201,7 @@ def on_press(event):
     global buttonState, selectedPt
     if event.inaxes is not axStim:
         return
-    print 'event pos %5.2f, %5.2f'%(event.xdata,event.ydata)
+#    print 'event pos %5.2f, %5.2f'%(event.xdata,event.ydata)
     inAPoint = False
     for pt in ptList:
         contains, attrd = pt['circle'].contains(event)
@@ -223,15 +223,21 @@ def on_press(event):
         ydata = event.ydata
         circ = mpatches.Circle((ydata, xdata), ptRad)
         axStim.add_patch(circ)
+        rod = ax3d.plot([ptList[-1]['xPos'], ptList[-1]['xPos']], 
+                  [-ptList[-1]['yPos'], -ptList[-1]['yPos']], 
+                  [-1, 1], zdir='y', color='gray')
+        bead = ax3d.scatter([ptList[0]['xPos']], [ptList[0]['xPos']], 
+                                 [0.], zdir='y', color='blue')
         ptList.append({'xPos':xdata,
                        'yPos':ydata,
                        'selected':True,
-                       'circle':circ})
-        ax3d.plot([ptList[-1]['xPos'], ptList[-1]['xPos']], 
-                  [-ptList[-1]['yPos'], -ptList[-1]['yPos']], 
-                  [-1, 1], zdir='y', color='gray')
+                       'circle':circ,
+                       'rod':rod,
+                       'bead':bead,
+                       'depth':0.})
         selectedPt = ptList[-1]
         updateWave()
+        plt.pause(.001)
 
 ########################    
 def on_release(event):
