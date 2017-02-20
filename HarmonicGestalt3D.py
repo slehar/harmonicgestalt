@@ -221,7 +221,7 @@ def on_press(event):
     if not inAPoint:
         xdata = event.xdata
         ydata = event.ydata
-        circ = mpatches.Circle((ydata, xdata), ptRad)
+        circ = mpatches.Circle((xdata, ydata), ptRad)
         axStim.add_patch(circ)
         rod = ax3d.plot([ptList[-1]['xPos'], ptList[-1]['xPos']], 
                   [-ptList[-1]['yPos'], -ptList[-1]['yPos']], 
