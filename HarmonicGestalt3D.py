@@ -221,13 +221,17 @@ def on_press(event):
     if not inAPoint:
         xdata = event.xdata
         ydata = event.ydata
-        circ = mpatches.Circle((xdata, ydata), ptRad)
+        plt.sca(axStim)
+        circ = mpatches.Circle((xdata, ydata), ptRad) # 2D point in axStim
         axStim.add_patch(circ)
-        rod = ax3d.plot([ptList[-1]['xPos'], ptList[-1]['xPos']], 
-                  [-ptList[-1]['yPos'], -ptList[-1]['yPos']], 
+        plt.sca(ax3d)
+        print 'plot rod'
+        rod = ax3d.plot([xdata, xdata], [-ydata, -ydata], 
                   [-1, 1], zdir='y', color='gray')
-        bead = ax3d.scatter([ptList[0]['xPos']], [ptList[0]['xPos']], 
+        print 'plot bead'
+        bead = ax3d.scatter([xdata], [-ydata], 
                                  [0.], zdir='y', color='blue')
+        print 'append'
         ptList.append({'xPos':xdata,
                        'yPos':ydata,
                        'selected':True,
@@ -238,6 +242,7 @@ def on_press(event):
         selectedPt = ptList[-1]
         updateWave()
         plt.pause(.001)
+        plt.show()
 
 ########################    
 def on_release(event):
