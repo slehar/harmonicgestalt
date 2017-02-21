@@ -64,15 +64,17 @@ def updateWave():
         data = np.uint8(fData)
         return
     elif len(ptList) == 2:
-        dist = np.sqrt((ptList[0]['xPos'] - ptList[1]['xPos'])**2. +
-                       (ptList[0]['yPos'] - ptList[1]['yPos'])**2.)
+        dist = np.sqrt((ptList[0]['xPos']  - ptList[1]['xPos'])**2. +
+                       (ptList[0]['yPos']  - ptList[1]['yPos'])**2. +
+                       (ptList[0]['depth'] - ptList[1]['depth']))
         freqList.append(int(BASEFREQ/dist))
     else:
         for point1 in ptList:
             for point2 in ptList:
                 if point1 is not point2:
-                    dist = np.sqrt((point1['xPos'] - point2['xPos'])**2. +
-                                   (point1['yPos'] - point2['yPos'])**2.)
+                    dist = np.sqrt((point1['xPos']  - point2['xPos'])**2. +
+                                   (point1['yPos']  - point2['yPos'])**2. +
+                                   (point1['depth'] - point2['depth']))
                     freqList.append(int(BASEFREQ/dist))
                                         
     fData = np.zeros(CHUNK, dtype=float)
@@ -162,6 +164,7 @@ def updateSliders(val):
         pt['depth'] = depth
         pt['bead'].set_offsets([pt['xPos'], -pt['yPos']])
         pt['bead'].set_3d_properties(depth, zdir='y')
+#    plt.pause(.001)
 #    plt.show()
 slider.on_changed(updateSliders)
                
