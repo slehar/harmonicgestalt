@@ -155,19 +155,21 @@ sliderAx.set_xticks([]); sliderAx.set_yticks([])
 slider = Slider(sliderAx, '0', -1., 1., valinit=0.)
 depth = slider.val
 
+ptList.append({'xPos':0., 'yPos':0., 'selected':False,'circle':circle, 
+               'rod':rod, 'bead':bead, 'depth':depth,
+               'slider':slider, 'sliderAx':sliderAx,})
+                              
 def updateSliders(val):
+    print 'in updateSliders'
     for pt in ptList:
         depth = pt['slider'].val
         pt['depth'] = depth
-        pt['bead'].set_offsets([ptList[0]['xPos'], -ptList[0]['yPos']])
+        pt['bead'].set_offsets([pt['xPos'], -pt['yPos']])
         pt['bead'].set_3d_properties(depth, zdir='y')
+        print pt
 #    plt.show()
 slider.on_changed(updateSliders)
                
-ptList.append({'xPos':0., 'yPos':0., 'selected':False,'circle':circle, 
-               'rod':rod, 'bead':bead, 'depth':depth,
-               'sliderAx':sliderAx,})
-                              
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05/winAspect, .7/winAspect, .15])
