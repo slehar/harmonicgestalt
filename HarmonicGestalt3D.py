@@ -28,9 +28,7 @@ twoPi = float(2.0*np.pi)
 data  = np.zeros(CHUNK, dtype=float)     # buffer of data
 time  = np.linspace(0, twoPi, CHUNK)     # time of data
 fData = np.sin(time)
-#plotTime = np.linspace(0, twoPi, num=PLOTWIDTH)
 plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
-#plotData = np.sin(plotTime) * 128 + 127
 plotData = np.zeros_like(plotTime)
 
 ptList = []
@@ -56,7 +54,6 @@ stream = pa.open(
             frames_per_buffer=CHUNK)
 
 ######## Keyboard callback updatewave ########
-
 # Update Wave to be played based on current dot positions
 def updateWave():
     global data, fData, time, ptList, freqList, line
@@ -102,8 +99,8 @@ fig.canvas.set_window_title('Harmonic Gestalt')
 
 #### Stimulus axes ####
 axStim = fig.add_axes([.1, .4/winAspect, .7/winAspect, .75])
-#axStim.set_xticks([])
-#axStim.set_yticks([])
+axStim.set_xticks([])
+axStim.set_yticks([])
 axStim.set_xlim([-1,1])
 axStim.set_ylim([-1,1])
 axStim.set_title('Stimulus')
@@ -160,13 +157,11 @@ ptList.append({'xPos':0., 'yPos':0., 'selected':False,'circle':circle,
                'slider':slider, 'sliderAx':sliderAx,})
                               
 def updateSliders(val):
-    print 'in updateSliders'
     for pt in ptList:
         depth = pt['slider'].val
         pt['depth'] = depth
         pt['bead'].set_offsets([pt['xPos'], -pt['yPos']])
         pt['bead'].set_3d_properties(depth, zdir='y')
-        print pt
 #    plt.show()
 slider.on_changed(updateSliders)
                
@@ -230,7 +225,6 @@ def on_press(event):
         axStim.add_patch(circ)
         plt.sca(ax3d)
 
-
         rod  = ax3d.plot([xdata, xdata], [-ydata, -ydata], [-1, 1], color='gray', zdir='y')
         bead = ax3d.scatter([xdata], [-ydata], [0.], zdir='y', color='blue')
         sliderAx = fig.add_axes([.6, .15+yOff, .6/winAspect, .02])
@@ -243,21 +237,7 @@ def on_press(event):
         ptList.append({'xPos':xdata, 'yPos':ydata, 'selected':False,'circle':circle, 
                'rod':rod, 'bead':bead, 'depth':depth,
                'slider':slider, 'sliderAx':sliderAx,})
-
-#        print 'plot rod'
-#        rod = ax3d.plot([xdata, xdata], [-ydata, -ydata], 
-#                  [-1, 1], zdir='y', color='gray')
-#        print 'plot bead'
-#        bead = ax3d.scatter([xdata], [-ydata], 
-#                                 [0.], zdir='y', color='blue')
-#        print 'append'
-#        ptList.append({'xPos':xdata,
-#                       'yPos':ydata,
-#                       'selected':True,
-#                       'circle':circ,
-#                       'rod':rod,
-#                       'bead':bead,
-#                       'depth':0.})
+               
         selectedPt = ptList[-1]
         updateWave()
         plt.pause(.001)
