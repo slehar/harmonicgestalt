@@ -66,7 +66,7 @@ def updateWave():
     elif len(ptList) == 2:
         dist = np.sqrt((ptList[0]['xPos']  - ptList[1]['xPos'])**2. +
                        (ptList[0]['yPos']  - ptList[1]['yPos'])**2. +
-                       (ptList[0]['depth'] - ptList[1]['depth']))
+                       (ptList[0]['depth'] - ptList[1]['depth'])**2.)
         freqList.append(int(BASEFREQ/dist))
     else:
         for point1 in ptList:
@@ -74,7 +74,7 @@ def updateWave():
                 if point1 is not point2:
                     dist = np.sqrt((point1['xPos']  - point2['xPos'])**2. +
                                    (point1['yPos']  - point2['yPos'])**2. +
-                                   (point1['depth'] - point2['depth']))
+                                   (point1['depth'] - point2['depth'])**2.)
                     freqList.append(int(BASEFREQ/dist))
                                         
     fData = np.zeros(CHUNK, dtype=float)
@@ -176,8 +176,6 @@ axSpect.set_ylim([0., 1000.])
 plotFreq = plotTime - np.pi
 line, = axSpect.semilogy(plotFreq, plotData)
 axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
-
-
 
 # Keypress 'q' to quit
 def press(event):
