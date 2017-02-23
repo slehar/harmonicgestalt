@@ -168,7 +168,8 @@ def updateSliders(val):
         pt['depth'] = depth
         pt['bead'].set_offsets([pt['xPos'], -pt['yPos']])
         pt['bead'].set_3d_properties(depth, zdir='y')
-#    plt.pause(.001)
+        updateWave()
+#        plt.pause(.001)
 #    plt.show()
 slider.on_changed(updateSliders)
                
