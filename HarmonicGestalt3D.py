@@ -15,7 +15,6 @@ import matplotlib.patches as mpatches
 import numpy as np
 from   matplotlib.widgets import Slider
 import pyaudio
-import matplotlib as mpl
 
 plt.rcParams['image.cmap'] = 'gray' 
 
@@ -206,23 +205,11 @@ def on_press(event):
     global buttonState, selectedPt, yOff
     if event.inaxes is not axStim:
         return
-    print 'In on_press()'
-    if selectedPt:
-        print 'selectedPt = %s'%selectedPt['label']
-    else:
-        print 'selectedPt = None'
-    print 'event pos %5.2f, %5.2f'%(event.xdata,event.ydata)
     inAPoint = False
     for pt in ptList:
-#        try:
         contains, attrd = pt['circle'].contains(event)
-#        except mpl.mplDeprecation:
-#            print '  except mplDeprication'
-        print '  contains = %r'%contains
-        print '  attrd = %r'%attrd
         if contains:
             inAPoint = True
-            print '  inAPoint = True'
             if pt['selected']:
                 pt['selected'] = False
                 pt['circle'].set_fc('blue')
@@ -235,7 +222,6 @@ def on_press(event):
     buttonState = True
     
     if not inAPoint:
-        print '  inAPoint = False, create new point'
         label = 'Pt %1d'%len(ptList)
         xdata = event.xdata
         ydata = event.ydata
@@ -266,8 +252,6 @@ def on_press(event):
 ########################    
 def on_release(event):
     global buttonState, selectedPt
-    if selectedPt:
-        print 'In on_release() selectedPt = %s'%selectedPt['label']
     for pt in ptList:
         #contains, attrd = pt['circle'].contains(event)
         if pt['selected']:
@@ -287,8 +271,6 @@ def on_motion(event):
     
     global xdata, ydata, selectedPt, ptList
     if buttonState:
-        print 'In on_motion() \nselectedPt = %s'%selectedPt['label']
-        print '  buttonState = True'
         xdata = event.xdata
         ydata = event.ydata
         selectedPt['circle'].center = (xdata, ydata)
