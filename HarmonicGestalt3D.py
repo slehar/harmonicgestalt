@@ -15,6 +15,7 @@ import matplotlib.patches as mpatches
 import numpy as np
 from   matplotlib.widgets import Slider
 import pyaudio
+import matplotlib as mpl
 
 plt.rcParams['image.cmap'] = 'gray' 
 
@@ -143,6 +144,7 @@ poly2.set_edgecolor('k')
 ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 
 # Create zeroth point
+label = 'Pt %1d'%len(ptList)
 circle = mpatches.Circle((0., 0.), ptRad)
 axStim.add_patch(circle)
 rod  = ax3d.plot([0., 0.], [0., 0.], [-1, 1], color='gray', zdir='y')
@@ -151,12 +153,15 @@ yOff = 0.; deltaY = -.03
 sliderAx = fig.add_axes([.6, .15, .6/winAspect, .02+yOff])
 yOff += deltaY
 sliderAx.set_xticks([]); sliderAx.set_yticks([])
-slider = Slider(sliderAx, '0', -1., 1., valinit=0.)
+slider = Slider(sliderAx, label, -1., 1., valinit=0.)
 depth = slider.val
 
-ptList.append({'xPos':0., 'yPos':0., 'selected':False,'circle':circle, 
+ptList.append({'label':label, 
+               'xPos':0., 'yPos':0., 'selected':False,'circle':circle, 
                'rod':rod, 'bead':bead, 'depth':depth,
                'slider':slider, 'sliderAx':sliderAx,})
+               
+print 'zeroth point %s'%ptList[0]['label']
                               
 def updateSliders(val):
     for pt in ptList:
@@ -201,12 +206,23 @@ def on_press(event):
     global buttonState, selectedPt, yOff
     if event.inaxes is not axStim:
         return
-#    print 'event pos %5.2f, %5.2f'%(event.xdata,event.ydata)
+    print 'In on_press()'
+    if selectedPt:
+        print 'selectedPt = %s'%selectedPt['label']
+    else:
+        print 'selectedPt = None'
+    print 'event pos %5.2f, %5.2f'%(event.xdata,event.ydata)
     inAPoint = False
     for pt in ptList:
+#        try:
         contains, attrd = pt['circle'].contains(event)
+#        except mpl.mplDeprecation:
+#            print '  except mplDeprication'
+        print '  contains = %r'%contains
+        print '  attrd = %r'%attrd
         if contains:
             inAPoint = True
+            print '  inAPoint = True'
             if pt['selected']:
                 pt['selected'] = False
                 pt['circle'].set_fc('blue')
@@ -219,11 +235,13 @@ def on_press(event):
     buttonState = True
     
     if not inAPoint:
+        print '  inAPoint = False, create new point'
+        label = 'Pt %1d'%len(ptList)
         xdata = event.xdata
         ydata = event.ydata
         plt.sca(axStim)
-        circ = mpatches.Circle((xdata, ydata), ptRad) # 2D point in axStim
-        axStim.add_patch(circ)
+        circle = mpatches.Circle((xdata, ydata), ptRad) # 2D point in axStim
+        axStim.add_patch(circle)
         plt.sca(ax3d)
 
         rod  = ax3d.plot([xdata, xdata], [-ydata, -ydata], [-1, 1], color='gray', zdir='y')
@@ -231,11 +249,12 @@ def on_press(event):
         sliderAx = fig.add_axes([.6, .15+yOff, .6/winAspect, .02])
         yOff += deltaY
         sliderAx.set_xticks([]); sliderAx.set_yticks([])
-        slider = Slider(sliderAx, str(len(ptList)), -1., 1., valinit=0.)
+        slider = Slider(sliderAx, label, -1., 1., valinit=0.)
         depth = slider.val
         slider.on_changed(updateSliders)
 
-        ptList.append({'xPos':xdata, 'yPos':ydata, 'selected':False,'circle':circle, 
+        ptList.append({'label':label,
+               'xPos':xdata, 'yPos':ydata, 'selected':False,'circle':circle, 
                'rod':rod, 'bead':bead, 'depth':depth,
                'slider':slider, 'sliderAx':sliderAx,})
                
@@ -247,7 +266,8 @@ def on_press(event):
 ########################    
 def on_release(event):
     global buttonState, selectedPt
-#    print 'In on_release()'
+    if selectedPt:
+        print 'In on_release() selectedPt = %s'%selectedPt['label']
     for pt in ptList:
         #contains, attrd = pt['circle'].contains(event)
         if pt['selected']:
@@ -264,9 +284,11 @@ def on_release(event):
     
 ########################        
 def on_motion(event):
+    
     global xdata, ydata, selectedPt, ptList
-
     if buttonState:
+        print 'In on_motion() \nselectedPt = %s'%selectedPt['label']
+        print '  buttonState = True'
         xdata = event.xdata
         ydata = event.ydata
         selectedPt['circle'].center = (xdata, ydata)
