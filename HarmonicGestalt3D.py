@@ -144,7 +144,8 @@ ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 
 # Create zeroth point
 label = 'Pt %1d'%len(ptList)
-circle = mpatches.Circle((0., 0.), ptRad)
+xPos, yPos = -.5, -.2
+circle = mpatches.Circle((xPos, yPos), ptRad)
 axStim.add_patch(circle)
 rod  = ax3d.plot([0., 0.], [0., 0.], [-1, 1], color='gray', zdir='y')
 bead = ax3d.scatter([0.], [0.], [0.], zdir='y', color='blue')
@@ -156,12 +157,16 @@ slider = Slider(sliderAx, label, -1., 1., valinit=0.)
 depth = slider.val
 
 ptList.append({'label':label, 
-               'xPos':0., 'yPos':0., 'selected':False,'circle':circle, 
-               'rod':rod, 'bead':bead, 'depth':depth,
-               'slider':slider, 'sliderAx':sliderAx,})
-               
-print 'zeroth point %s'%ptList[0]['label']
-                              
+               'xPos':xPos, 
+               'yPos':yPos, 
+               'selected':False,
+               'circle':circle, 
+               'rod':rod, 
+               'bead':bead, 
+               'depth':depth,
+               'sliderAx':sliderAx, 
+               'slider':slider,})
+                                             
 def updateSliders(val):
     for pt in ptList:
         depth = pt['slider'].val
@@ -169,8 +174,6 @@ def updateSliders(val):
         pt['bead'].set_offsets([pt['xPos'], -pt['yPos']])
         pt['bead'].set_3d_properties(depth, zdir='y')
         updateWave()
-#        plt.pause(.001)
-#    plt.show()
 slider.on_changed(updateSliders)
                
 
@@ -241,9 +244,15 @@ def on_press(event):
         slider.on_changed(updateSliders)
 
         ptList.append({'label':label,
-               'xPos':xdata, 'yPos':ydata, 'selected':False,'circle':circle, 
-               'rod':rod, 'bead':bead, 'depth':depth,
-               'slider':slider, 'sliderAx':sliderAx,})
+                       'xPos':xdata, 
+                       'yPos':ydata, 
+                       'selected':False,
+                       'circle':circle, 
+                       'rod':rod, 
+                       'bead':bead, 
+                       'depth':depth,
+                       'sliderAx':sliderAx, 
+                       'slider':slider,})
                
         selectedPt = ptList[-1]
         updateWave()
@@ -283,7 +292,7 @@ def on_motion(event):
         selectedPt['bead'].set_offsets([xdata, -ydata])
         selectedPt['bead'].set_3d_properties(ptList[0]['depth'], zdir='y')
         plt.pause(.001)
-        fig.canvas.draw()
+#        fig.canvas.draw()
         updateWave()
    	   
 
