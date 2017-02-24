@@ -99,6 +99,8 @@ winAspect = float(figYSize)/float(figXSize)
 plt.close('all')
 fig = plt.figure(figsize=(figYSize,figXSize))
 fig.canvas.set_window_title('Harmonic Gestalt')
+fig.text(.008/winAspect, .9, 'click new point\ndrag move point')
+fig.text(.008/winAspect, .7, 'd : delete pt\n\nm : mute\n\nq : quit')
 
 #### Stimulus axes ####
 axStim = fig.add_axes([.1, .4/winAspect, .7/winAspect, .75])
