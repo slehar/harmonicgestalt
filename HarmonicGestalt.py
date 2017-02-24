@@ -114,12 +114,12 @@ axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 
 
 #### Axes for sliders ####
-axSl1 = fig.add_axes([.825, .7, .05, .275])
-axSl1.set_xticks([])
-axSl1.set_yticks([])
-axSl2 = fig.add_axes([.92, .7, .05, .275])
-axSl2.set_xticks([])
-axSl2.set_yticks([])
+#axSl1 = fig.add_axes([.825, .7, .05, .275])
+#axSl1.set_xticks([])
+#axSl1.set_yticks([])
+#axSl2 = fig.add_axes([.92, .7, .05, .275])
+#axSl2.set_xticks([])
+#axSl2.set_yticks([])
 
 # Keypress 'q' to quit
 def press(event):
