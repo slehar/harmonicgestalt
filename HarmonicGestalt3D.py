@@ -148,10 +148,10 @@ label = 'Pt %1d'%len(ptList)
 xPos, yPos = -.5, -.2
 circle = mpatches.Circle((xPos, yPos), ptRad)
 axStim.add_patch(circle)
-rod  = ax3d.plot([0., 0.], [0., 0.], [-1, 1], color='gray', zdir='y')
-bead = ax3d.scatter([0.], [0.], [0.], zdir='y', color='blue')
+rod  = ax3d.plot([xPos, xPos], [-yPos, -yPos], [-1, 1], color='gray', zdir='y')
+bead = ax3d.scatter([xPos], [-yPos], [0.], zdir='y', color='blue')
 yOff = 0.; deltaY = -.03
-sliderAx = fig.add_axes([.6, .15, .6/winAspect, .02+yOff])
+sliderAx = fig.add_axes([.6, .15+yOff, .6/winAspect, .02])
 yOff += deltaY
 sliderAx.set_xticks([]); sliderAx.set_yticks([])
 slider = Slider(sliderAx, label, -1., 1., valinit=0.)
