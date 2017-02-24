@@ -205,6 +205,8 @@ def press(event):
         if len(ptList) > 0:
             lastPt = ptList.pop()
             lastPt['circle'].remove()
+            lastPt['rod'].pop(0).remove()
+            lastPt['bead'].remove()
             fig.canvas.draw()
             updateWave()
 
