@@ -182,7 +182,7 @@ slider.on_changed(updateSliders)
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05/winAspect, .7/winAspect, .15])
-axSpect.set_xlim([-3., 3.])
+axSpect.set_xlim([-2., 2.])
 axSpect.set_ylim([0., 1000.])
 plotFreq = plotTime - np.pi
 line, = axSpect.semilogy(plotFreq, plotData)
