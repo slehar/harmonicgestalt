@@ -27,13 +27,13 @@ plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
 #plotData = np.sin(plotTime) * 128 + 127
 plotData = np.zeros_like(plotTime)
 
-ptList = []
-ptList.append({'xPos':.5, 'yPos':.5, 'selected':False})
-selectedPt = None
 freqList = []
 
 buttonState = False
-xdata, ydata = .5, .5
+xdata, ydata = -.5, 0.
+ptList = []
+ptList.append({'xPos':xdata, 'yPos':ydata, 'selected':False})
+selectedPt = None
 
     
 # PyAudio Callback - gets called repeatedly
@@ -97,12 +97,14 @@ fig.canvas.set_window_title('Harmonic Gestalt')
 
 #### Main axes ####
 ax = fig.add_axes([.1, .225, .7, .75])
+ax.set_xlim([-1,1])
+ax.set_ylim([-1,1])
 ax.set_xticks([])
 ax.set_yticks([])
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05, .7, .15])
-axSpect.set_xlim([-3., 3.])
+axSpect.set_xlim([-2.8, 2.8])
 #axSpect.set_xticks([-500, 0, 500])
 #axSpect.set_ylim([0., 255.])
 axSpect.set_ylim([0., 1000.])
@@ -111,15 +113,6 @@ axSpect.set_ylim([0., 1000.])
 plotFreq = plotTime - np.pi
 line, = axSpect.semilogy(plotFreq, plotData)
 axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
-
-
-#### Axes for sliders ####
-#axSl1 = fig.add_axes([.825, .7, .05, .275])
-#axSl1.set_xticks([])
-#axSl1.set_yticks([])
-#axSl2 = fig.add_axes([.92, .7, .05, .275])
-#axSl2.set_xticks([])
-#axSl2.set_yticks([])
 
 # Keypress 'q' to quit
 def press(event):
