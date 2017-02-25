@@ -34,7 +34,11 @@ freqList = []
 buttonState = False
 xdata, ydata = -.5, 0.
 ptList = []
-ptList.append({'xPos':xdata, 'yPos':ydata, 'selected':False})
+ptList.append({'xPos':xdata, 
+               'yPos':ydata, 
+               'selected':False,
+               'absPos':np.array([xdata, ydata, 1.]),
+               'transPos':np.array([xdata, ydata, 1.])})
 selectedPt = None
 
     
@@ -132,8 +136,15 @@ slider2 = VertSlider(axSl2, 'orient', -np.pi, np.pi, valinit=0.)
 orient = slider2.val
 
 def updateSl1(val):
-    global scale    
+    global scale, transMat, invMat    
     scale = slider1.val
+    transMat[0, 0] = scale
+    transMat[1, 1] = scale
+    invMat = np.linalg.inv(transMat)
+    
+    for pt in ptList:
+        pt['transPos'] = np.matmul(pt['absPos'], transMat)
+        pt['circle'].center = pt['transPos']
     updateWave()
 slider1.on_changed(updateSl1)
 def updateSl2(val):
@@ -157,6 +168,13 @@ def press(event):
             lastPt['circle'].remove()
             fig.canvas.draw()
             updateWave()
+
+# Transformation matrix & its inverse
+transMat = np.array([[scale, 0,     0],
+                     [0,     scale, 0],
+                     [0,     0,     1]])
+
+invMat = np.linalg.inv(transMat)
 
 ########################
 def on_press(event):
@@ -183,10 +201,15 @@ def on_press(event):
     if not inAPoint:
         xdata = event.xdata
         ydata = event.ydata
-        circ = mpatches.Circle((xdata, ydata), ptRad)
+        absPos = [xdata, ydata, 1.]
+        transPos = np.matmul(absPos, transMat)
+#        circ = mpatches.Circle((xdata, ydata), ptRad)
+        circ = mpatches.Circle(transPos, ptRad)
         ax.add_patch(circ)
         ptList.append({'xPos':xdata,
                        'yPos':ydata,
+                       'absPos':absPos,
+                       'transPos':transPos,
                        'selected':True,
                        'circle':circ})
         selectedPt = ptList[-1]
@@ -201,7 +224,11 @@ def on_release(event):
         if pt['selected']:
             xdata = event.xdata
             ydata = event.ydata
-            pt['circle'].center = (xdata, ydata)
+            absPos = [xdata, ydata, 1.]
+            transPos = np.matmul(absPos, transMat)
+    #        circ = mpatches.Circle((xdata, ydata), ptRad)
+#            circ = mpatches.Circle(transPos, ptRad)
+            pt['circle'].center = transPos
             buttonState = False
             pt['selected'] = False
             selectedPt = None
@@ -217,7 +244,11 @@ def on_motion(event):
     if buttonState:
         xdata = event.xdata
         ydata = event.ydata
-        selectedPt['circle'].center = (xdata, ydata)
+        absPos = [xdata, ydata, 1.]
+        transPos = np.matmul(absPos, transMat)
+#        circ = mpatches.Circle((xdata, ydata), ptRad)
+#        circ = mpatches.Circle(transPos, ptRad)
+        selectedPt['circle'].center = transPos
         selectedPt['xPos'] = xdata
         selectedPt['yPos'] = ydata
         fig.canvas.draw()
