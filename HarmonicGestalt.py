@@ -148,9 +148,20 @@ def updateSl1(val):
 slider1.on_changed(updateSl1)
 
 def updateSl2(val):
-    global orient    
+    global orient, transMat, invMat    
     orient = slider2.val
-    updateWave()
+    transMat[0,0] =  scale *  np.cos(orient)
+    transMat[0,1] =  1.    *  np.sin(orient)
+    transMat[1,0] =  1.    * -np.sin(orient)
+    transMat[1,1] =  scale *  np.cos(orient)
+    invMat = np.linalg.inv(transMat)
+    
+    for pt in ptList:
+        pt['transPos'] = np.matmul(pt['absPos'], transMat)
+        pt['xPos'] = pt['transPos'][0]
+        pt['yPos'] = pt['transPos'][1]
+        pt['circle'].center = pt['transPos'][:2]
+        updateWave()
 slider2.on_changed(updateSl2)
 
 
