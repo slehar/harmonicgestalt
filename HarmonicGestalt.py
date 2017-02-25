@@ -93,10 +93,13 @@ def updateWave():
 
 
 ####### Open figure and set axes 1 for drawing Artists ########
+figYSize, figXSize = (10,8)
+winAspect = float(figYSize)/float(figXSize)
 plt.close('all')
-fig = plt.figure(figsize=(10,8))
-aspect = 10./8.
+fig = plt.figure(figsize=(figYSize,figXSize))
 fig.canvas.set_window_title('Harmonic Gestalt')
+fig.text(1.02/winAspect, .5, 'click new point\ndrag move point')
+fig.text(1.03/winAspect, .3, 'd : delete pt\n\nm : mute\n\nq : quit')
 
 #### Main axes ####
 ax = fig.add_axes([.1, .225, .7, .75])
