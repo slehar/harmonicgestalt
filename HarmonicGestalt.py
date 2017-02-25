@@ -141,9 +141,12 @@ def updateSl1(val):
     
     for pt in ptList:
         pt['transPos'] = np.matmul(pt['absPos'], transMat)
+        pt['xPos'] = pt['transPos'][0]
+        pt['yPos'] = pt['transPos'][1]
         pt['circle'].center = pt['transPos'][:2]
     updateWave()
 slider1.on_changed(updateSl1)
+
 def updateSl2(val):
     global orient    
     orient = slider2.val
