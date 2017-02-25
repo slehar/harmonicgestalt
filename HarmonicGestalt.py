@@ -12,6 +12,7 @@ import matplotlib.patches as mpatches
 import numpy as np
 import pyaudio
 from vertslider import VertSlider
+from scipy import signal
 
 # global variables
 ptRad     = .01      # Radius of points
@@ -56,41 +57,6 @@ stream = pa.open(
 
 ######## Keyboard callback updatewave ########
 
-# Update Wave to be played based on current dot positions
-def updateWave():
-    global data, fData, time, ptList, freqList, line
-
-    freqList = []
-    if len(ptList) < 2:
-        fData = np.zeros(CHUNK, dtype=float)
-        data = np.uint8(fData)
-        return
-    elif len(ptList) == 2:
-        dist = np.sqrt((ptList[0]['xPos'] - ptList[1]['xPos'])**2. +
-                       (ptList[0]['yPos'] - ptList[1]['yPos'])**2.)
-        freqList.append(int(BASEFREQ/dist))
-    else:
-        for point1 in ptList:
-            for point2 in ptList:
-                if point1 is not point2:
-                    dist = np.sqrt((point1['xPos'] - point2['xPos'])**2. +
-                                   (point1['yPos'] - point2['yPos'])**2.)
-                    freqList.append(int(BASEFREQ/dist))
-                                        
-    fData = np.zeros(CHUNK, dtype=float)
-    for freq in freqList:
-        iFreq = float(int(freq/10.))
-        fData += np.sin(time*iFreq)
-    fData = fData / np.max(np.abs(fData)) * 127 + 128
-    yData = np.abs(np.fft.fft(fData[:PLOTWIDTH]))
-    yData /= 100.
-#    yData /= yData.max()
-#    yData = np.log(yData)
-    yDataSwap = np.fft.fftshift(yData)
-    line.set_ydata(yDataSwap)
-    fig.canvas.draw()
-    data = np.uint8(fData)
-
 
 ####### Open figure and set axes 1 for drawing Artists ########
 figYSize, figXSize = (10,8)
@@ -100,6 +66,8 @@ fig = plt.figure(figsize=(figYSize,figXSize))
 fig.canvas.set_window_title('Harmonic Gestalt')
 fig.text(1.02/winAspect, .5, 'click new point\ndrag move point')
 fig.text(1.03/winAspect, .3, 'd : delete pt\n\nm : mute\n\nq : quit')
+nPeaks = 0
+peaksTxt = fig.text(.9/winAspect, .1, 'Peaks %3d'%nPeaks)
 
 #### Main axes ####
 ax = fig.add_axes([.1, .225, .7, .75])
@@ -134,6 +102,45 @@ scale = slider1.val
 
 slider2 = VertSlider(axSl2, 'orient', -np.pi, np.pi, valinit=0.)
 orient = slider2.val
+
+# Update Wave to be played based on current dot positions
+def updateWave():
+    global data, fData, time, ptList, freqList, line, nPeaks
+
+    freqList = []
+    if len(ptList) < 2:
+        fData = np.zeros(CHUNK, dtype=float)
+        data = np.uint8(fData)
+        return
+    elif len(ptList) == 2:
+        dist = np.sqrt((ptList[0]['xPos'] - ptList[1]['xPos'])**2. +
+                       (ptList[0]['yPos'] - ptList[1]['yPos'])**2.)
+        freqList.append(int(BASEFREQ/dist))
+    else:
+        for point1 in ptList:
+            for point2 in ptList:
+                if point1 is not point2:
+                    dist = np.sqrt((point1['xPos'] - point2['xPos'])**2. +
+                                   (point1['yPos'] - point2['yPos'])**2.)
+                    freqList.append(int(BASEFREQ/dist))
+                                        
+    fData = np.zeros(CHUNK, dtype=float)
+    for freq in freqList:
+        iFreq = float(int(freq/10.))
+        fData += np.sin(time*iFreq)
+    fData = fData / np.max(np.abs(fData)) * 127 + 128
+    yData = np.abs(np.fft.fft(fData[:PLOTWIDTH]))
+    yData /= 100.
+#    yData /= yData.max()
+#    yData = np.log(yData)
+    yDataSwap = np.fft.fftshift(yData)
+    line.set_ydata(yDataSwap)
+    peakIndx = signal.find_peaks_cwt(yDataSwap, np.array([1,2,3,4,5]))
+    nPeaks = len(peakIndx)
+    peaksTxt.set_text('Peaks %3d'%nPeaks)
+    plt.pause(.001)
+    fig.canvas.draw()
+    data = np.uint8(fData)
 
 def updateSl1(val):
     global scale, transMat, invMat    
