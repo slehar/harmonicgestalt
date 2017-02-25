@@ -162,6 +162,8 @@ def press(event):
 def on_press(event):
     global buttonState, selectedPt
 #    print 'In on_press()'
+    if event.inaxes is not ax:
+        return
     inAPoint = False
     for pt in ptList:
         contains, attrd = pt['circle'].contains(event)
