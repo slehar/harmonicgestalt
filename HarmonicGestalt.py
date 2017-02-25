@@ -161,7 +161,7 @@ def updateSl2(val):
         pt['xPos'] = pt['transPos'][0]
         pt['yPos'] = pt['transPos'][1]
         pt['circle'].center = pt['transPos'][:2]
-        updateWave()
+    updateWave()
 slider2.on_changed(updateSl2)
 
 
