@@ -144,7 +144,7 @@ def updateSl1(val):
     
     for pt in ptList:
         pt['transPos'] = np.matmul(pt['absPos'], transMat)
-        pt['circle'].center = pt['transPos']
+        pt['circle'].center = pt['transPos'][:2]
     updateWave()
 slider1.on_changed(updateSl1)
 def updateSl2(val):
@@ -201,13 +201,13 @@ def on_press(event):
     if not inAPoint:
         xdata = event.xdata
         ydata = event.ydata
-        absPos = [xdata, ydata, 1.]
-        transPos = np.matmul(absPos, transMat)
+        transPos = [xdata, ydata, 1.]
+        absPos = np.matmul(transPos, invMat)
 #        circ = mpatches.Circle((xdata, ydata), ptRad)
         circ = mpatches.Circle(transPos, ptRad)
         ax.add_patch(circ)
-        ptList.append({'xPos':xdata,
-                       'yPos':ydata,
+        ptList.append({'xPos':transPos[0],
+                       'yPos':transPos[1],
                        'absPos':absPos,
                        'transPos':transPos,
                        'selected':True,
@@ -224,11 +224,11 @@ def on_release(event):
         if pt['selected']:
             xdata = event.xdata
             ydata = event.ydata
-            absPos = [xdata, ydata, 1.]
-            transPos = np.matmul(absPos, transMat)
+            transPos = [xdata, ydata, 1.]
+            pt['absPos'] = np.matmul(transPos, invMat)
     #        circ = mpatches.Circle((xdata, ydata), ptRad)
 #            circ = mpatches.Circle(transPos, ptRad)
-            pt['circle'].center = transPos
+            pt['circle'].center = transPos[:2]
             buttonState = False
             pt['selected'] = False
             selectedPt = None
@@ -248,9 +248,9 @@ def on_motion(event):
         transPos = np.matmul(absPos, transMat)
 #        circ = mpatches.Circle((xdata, ydata), ptRad)
 #        circ = mpatches.Circle(transPos, ptRad)
-        selectedPt['circle'].center = transPos
-        selectedPt['xPos'] = xdata
-        selectedPt['yPos'] = ydata
+        selectedPt['circle'].center = transPos[:2]
+        selectedPt['xPos'] = transPos[0]
+        selectedPt['yPos'] = transPos[1]
         fig.canvas.draw()
         updateWave()
    	   
