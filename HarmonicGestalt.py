@@ -9,8 +9,10 @@ Created on Wed Jun  1 09:45:43 2016
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+#from   matplotlib.widgets import Slider
 import numpy as np
 import pyaudio
+from vertslider import VertSlider
 
 # global variables
 ptRad     = .01      # Radius of points
@@ -113,6 +115,33 @@ axSpect.set_ylim([0., 1000.])
 plotFreq = plotTime - np.pi
 line, = axSpect.semilogy(plotFreq, plotData)
 axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
+
+#### Axes for sliders ####
+axSl1 = fig.add_axes([.825, .7, .05, .275])
+axSl1.set_xticks([])
+axSl1.set_yticks([])
+
+axSl2 = fig.add_axes([.92, .7, .05, .275])
+axSl2.set_xticks([])
+axSl2.set_yticks([])
+
+slider1 = VertSlider(axSl1, 'scale', -2., 2., valinit=1.)
+scale = slider1.val
+
+slider2 = VertSlider(axSl2, 'orient', -np.pi, np.pi, valinit=0.)
+orient = slider2.val
+
+def updateSl1(val):
+    global scale    
+    scale = slider1.val
+    updateWave()
+slider1.on_changed(updateSl1)
+def updateSl2(val):
+    global orient    
+    orient = slider2.val
+    updateWave()
+slider2.on_changed(updateSl2)
+
 
 # Keypress 'q' to quit
 def press(event):
