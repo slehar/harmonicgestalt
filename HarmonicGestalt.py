@@ -9,7 +9,6 @@ Created on Wed Jun  1 09:45:43 2016
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-#from   matplotlib.widgets import Slider
 import numpy as np
 import pyaudio
 from vertslider import VertSlider
@@ -24,9 +23,7 @@ twoPi = float(2.0*np.pi)
 data  = np.zeros(CHUNK, dtype=float)     # buffer of data
 time  = np.linspace(0, twoPi, CHUNK)     # time of data
 fData = np.sin(time)
-#plotTime = np.linspace(0, twoPi, num=PLOTWIDTH)
 plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
-#plotData = np.sin(plotTime) * 128 + 127
 plotData = np.zeros_like(plotTime)
 
 freqList = []
@@ -34,11 +31,11 @@ freqList = []
 buttonState = False
 xdata, ydata = -.5, 0.
 ptList = []
-ptList.append({'xPos':xdata, 
-               'yPos':ydata, 
-               'selected':False,
-               'absPos':np.array([xdata, ydata, 1.]),
-               'transPos':np.array([xdata, ydata, 1.])})
+#ptList.append({'xPos':xdata, 
+#               'yPos':ydata, 
+#               'selected':False,
+#               'absPos':np.array([xdata, ydata, 1.]),
+#               'transPos':np.array([xdata, ydata, 1.])})
 selectedPt = None
 
     
@@ -255,8 +252,8 @@ def on_motion(event):
         updateWave()
    	   
     
-ptList[0]['circle'] = mpatches.Circle((xdata, ydata), ptRad)
-ax.add_patch(ptList[0]['circle'])
+#ptList[0]['circle'] = mpatches.Circle((xdata, ydata), ptRad)
+#ax.add_patch(ptList[0]['circle'])
 
 # Connect fig to events
 fig.canvas.mpl_connect('button_press_event',    on_press)
