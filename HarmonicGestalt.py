@@ -106,7 +106,7 @@ orient = slider2.val
 
 # For smoothing Fourier signal Gaussian(nPts, )
 # p = 1: gaussian (smooth); p = .5: laplace (pointy peak)
-gaussWin = signal.general_gaussian(51, p=0.5, sig=50)
+gaussWin = signal.general_gaussian(51, p=0.5, sig=.5)
 
 # Update Wave to be played based on current dot positions
 def updateWave():
