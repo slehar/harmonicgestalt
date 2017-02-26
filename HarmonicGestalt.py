@@ -67,7 +67,7 @@ fig.canvas.set_window_title('Harmonic Gestalt')
 fig.text(1.02/winAspect, .5, 'click new point\ndrag move point')
 fig.text(1.03/winAspect, .3, 'd : delete pt\n\nm : mute\n\nq : quit')
 nPeaks = 0
-peaksTxt = fig.text(.9/winAspect, .1, 'Peaks %3d'%nPeaks)
+peaksTxt = fig.text(.9/winAspect, .13, 'Peaks %3d'%nPeaks)
 
 #### Main axes ####
 ax = fig.add_axes([.1, .225, .7, .75])
@@ -78,14 +78,15 @@ ax.set_yticks([])
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05, .7, .15])
-axSpect.set_xlim([-2.8, 2.8])
+axSpect.set_xlim([-2.1, 2.1])
 #axSpect.set_xticks([-500, 0, 500])
 #axSpect.set_ylim([0., 255.])
 axSpect.set_ylim([0., 1000.])
 #axSpect.set_yticks(['0', '500', '1000'])
 #line, = axSpect.plot(plotTime, plotData)
 plotFreq = plotTime - np.pi
-line, = axSpect.semilogy(plotFreq, plotData)
+line,  = axSpect.semilogy(plotFreq, plotData)
+line1, = axSpect.semilogy(plotFreq, plotData, color='r')
 axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 
 #### Axes for sliders ####
@@ -103,9 +104,13 @@ scale = slider1.val
 slider2 = VertSlider(axSl2, 'orient', -np.pi, np.pi, valinit=0.)
 orient = slider2.val
 
+# For smoothing Fourier signal Gaussian(nPts, )
+# p = 1: gaussian (smooth); p = .5: laplace (pointy peak)
+gaussWin = signal.general_gaussian(51, p=0.5, sig=50)
+
 # Update Wave to be played based on current dot positions
 def updateWave():
-    global data, fData, time, ptList, freqList, line, nPeaks
+    global data, fData, time, ptList, freqList, line, nPeaks, yDataSwap, filtered
 
     freqList = []
     if len(ptList) < 2:
@@ -134,8 +139,11 @@ def updateWave():
 #    yData /= yData.max()
 #    yData = np.log(yData)
     yDataSwap = np.fft.fftshift(yData)
+    filtered = signal.convolve(yDataSwap, gaussWin, mode='same')
+    filtered = filtered/filtered.max() * yDataSwap.max()
     line.set_ydata(yDataSwap)
-    peakIndx = signal.find_peaks_cwt(yDataSwap, np.array([1,2,3,4,5]))
+    line1.set_ydata(filtered)
+    peakIndx = signal.find_peaks_cwt(filtered, np.array([1,2,3,4,5]))
     nPeaks = len(peakIndx)
     peaksTxt.set_text('Peaks %3d'%nPeaks)
     plt.pause(.001)
