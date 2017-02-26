@@ -26,7 +26,7 @@ time  = np.linspace(0, twoPi, CHUNK)     # time of data
 fData = np.sin(time)
 plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
 plotData = np.zeros_like(plotTime)
-
+mute = False
 freqList = []
 
 buttonState = False
@@ -185,12 +185,19 @@ slider2.on_changed(updateSl2)
 
 # Keypress 'q' to quit
 def press(event):
-    global ptList, data
+    global ptList, data, mute
     if event.key == 'q':
         stream.stop_stream()
         stream.close()
         pa.terminate()
         plt.close()
+    elif event.key == 'm':
+        if mute:
+            mute = False
+            stream.start_stream()
+        else:
+            mute = True
+            stream.stop_stream()
     elif event.key == 'backspace':
         if len(ptList) > 0:
             lastPt = ptList.pop()
