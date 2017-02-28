@@ -25,6 +25,7 @@ data  = np.zeros(CHUNK, dtype=float)     # buffer of data
 time  = np.linspace(0, twoPi, CHUNK)     # time of data
 fData = np.sin(time)
 plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
+plotFreq = np.arange(-2.1, 2.1, 4.2/PLOTWIDTH)
 plotData = np.zeros_like(plotTime)
 mute = False
 freqList = []
@@ -87,6 +88,10 @@ axSpect.set_ylim([0., 1000.])
 plotFreq = plotTime - np.pi
 line,  = axSpect.semilogy(plotFreq, plotData)
 line1, = axSpect.semilogy(plotFreq, plotData, color='r')
+peakArray = []
+for x in range(21):
+    peakArray.append(axSpect.semilogy([(x-10)*2/10., (x-10)*2/10.],[0, 1000], 
+                                       color='r', visible=True))
 axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 
 #### Axes for sliders ####
@@ -111,6 +116,7 @@ gaussWin = signal.general_gaussian(51, p=0.5, sig=.5)
 # Update Wave to be played based on current dot positions
 def updateWave():
     global data, fData, time, ptList, freqList, line, nPeaks, yDataSwap, filtered
+    global peakIndices, freqAt
 
     freqList = []
     if len(ptList) < 2:
@@ -143,9 +149,19 @@ def updateWave():
     filtered = filtered/filtered.max() * yDataSwap.max()
     line.set_ydata(yDataSwap)
     line1.set_ydata(filtered)
-    peakIndx = signal.find_peaks_cwt(filtered, np.array([1,2,3,4,5]))
-    nPeaks = len(peakIndx)
+    peakIndices = signal.find_peaks_cwt(filtered, np.array([1,3,5,7,9]))
+    nPeaks = len(peakIndices)
     peaksTxt.set_text('Peaks %3d'%nPeaks)
+    lineIx = 0
+    for peak in peakArray:
+        peak[0].set_visible(False)
+    for peakIx in peakIndices:
+        freqAt = float(plotFreq[peakIx])
+        peakArray[lineIx][0].set_xdata((freqAt, freqAt))
+        peakArray[lineIx][0].set_ydata([0., 1000])
+        peakArray[lineIx][0].set_visible(True)
+        lineIx += 1
+        
     plt.pause(.001)
     fig.canvas.draw()
     data = np.uint8(fData)
