@@ -58,9 +58,6 @@ stream = pa.open(
             stream_callback=paCallback,
             frames_per_buffer=CHUNK)
 
-######## Keyboard callback updatewave ########
-
-
 ####### Open figure and set axes 1 for drawing Artists ########
 figYSize, figXSize = (10,8)
 winAspect = float(figYSize)/float(figXSize)
@@ -115,6 +112,7 @@ orient = slider2.val
 # p = 1: gaussian (smooth); p = .5: laplace (pointy peak)
 gaussWin = signal.general_gaussian(51, p=0.5, sig=.5)
 
+######## Keyboard callback updatewave ########
 # Update Wave to be played based on current dot positions
 def updateWave():
     global data, fData, time, ptList, freqList, line, nPeaks, yDataSwap, filtered
@@ -151,7 +149,10 @@ def updateWave():
     filtered = filtered/filtered.max() * yDataSwap.max()
     line.set_ydata(yDataSwap)
 #    line1.set_ydata(filtered)
-    peakIndices = signal.find_peaks_cwt(yDataSwap, np.array([1,2,3,4,5]))
+    peakIndices = signal.find_peaks_cwt(yDataSwap, np.arange(1, 5), 
+                                        max_distances=np.arange(1, 5)*2,
+                                        min_snr=.1)
+    peakIndices = peakIndices[1:-1] # kludge - first & last peaks spurious
     nPeaks = len(peakIndices)
     peaksTxt.set_text('Peaks %3d'%nPeaks)
     lineIx = 0
