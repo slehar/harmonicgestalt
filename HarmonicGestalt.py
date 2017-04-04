@@ -25,7 +25,7 @@ data  = np.zeros(CHUNK, dtype=float)     # buffer of data
 time  = np.linspace(0, twoPi, CHUNK)     # time of data
 fData = np.sin(time)
 plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
-freqMin, freqMax = -2.1, 2.1
+freqMin, freqMax = -1.0, 1.0
 freqRange = freqMax - freqMin
 plotFreq = np.arange(freqMin, freqMax, freqRange/PLOTWIDTH)
 plotData = np.zeros_like(plotTime)
