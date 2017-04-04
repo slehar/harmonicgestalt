@@ -146,6 +146,7 @@ poly2.set_edgecolor('k')
 ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 
 # Create zeroth point
+'''
 label = 'Pt %1d'%len(ptList)
 xPos, yPos = -.5, -.2
 circle = mpatches.Circle((xPos, yPos), ptRad)
@@ -169,7 +170,9 @@ ptList.append({'label':label,
                'depth':depth,
                'sliderAx':sliderAx, 
                'slider':slider,})
-                                             
+'''
+
+'''                                             
 def updateSliders(val):
     for pt in ptList:
         depth = pt['slider'].val
@@ -178,7 +181,7 @@ def updateSliders(val):
         pt['bead'].set_3d_properties(depth, zdir='y')
         updateWave()
 slider.on_changed(updateSliders)
-               
+'''               
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05/winAspect, .7/winAspect, .15])
@@ -244,12 +247,13 @@ def on_press(event):
 
         rod  = ax3d.plot([xdata, xdata], [-ydata, -ydata], [-1, 1], color='gray', zdir='y')
         bead = ax3d.scatter([xdata], [-ydata], [0.], zdir='y', color='blue')
-        sliderAx = fig.add_axes([.6, .15+yOff, .6/winAspect, .02])
-        yOff += deltaY
-        sliderAx.set_xticks([]); sliderAx.set_yticks([])
-        slider = Slider(sliderAx, label, -1., 1., valinit=0.)
-        depth = slider.val
-        slider.on_changed(updateSliders)
+#        sliderAx = fig.add_axes([.6, .15+yOff, .6/winAspect, .02])
+#        yOff += deltaY
+#        sliderAx.set_xticks([]); sliderAx.set_yticks([])
+#        slider = Slider(sliderAx, label, -1., 1., valinit=0.)
+#        depth = slider.val
+#        slider.on_changed(updateSliders)
+        depth = 0.
 
         ptList.append({'label':label,
                        'xPos':xdata, 
@@ -258,9 +262,7 @@ def on_press(event):
                        'circle':circle, 
                        'rod':rod, 
                        'bead':bead, 
-                       'depth':depth,
-                       'sliderAx':sliderAx, 
-                       'slider':slider,})
+                       'depth':depth})
                
         selectedPt = ptList[-1]
         updateWave()
