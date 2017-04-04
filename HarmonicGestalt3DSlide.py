@@ -14,6 +14,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
 from   matplotlib.widgets import Slider
+from   matplotlib.widgets import RadioButtons
 import pyaudio
 
 plt.rcParams['image.cmap'] = 'gray' 
@@ -144,6 +145,31 @@ poly2.set_alpha(0.7)
 poly2.set_color('w')
 poly2.set_edgecolor('k')
 ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
+
+# Necker Radiobuttons
+rax = plt.axes([0.01, 0.35, 0.15/winAspect, 0.3])
+radio = RadioButtons(rax, ['Clear', 'Nek0', 'Nek1', 'Nek2', 'Nek3'])
+
+# radio button callback function to switch Necker pattern
+def setPattern(label):
+    global psfMode
+    
+    if   label == 'Clear':
+        print 'Clear'
+    elif label == 'Nek0':
+        print 'Nek0'
+    elif label == 'Nek1':
+        print 'Nek1'
+    elif label == 'Nek2':
+        print 'Nek2'
+    elif label == 'Nek3':
+        print 'Nek3'
+    plt.show()
+    plt.pause(.001)
+    updateWave()
+    plt.draw()    
+radio.on_clicked(setPattern)
+
 
 # Create zeroth point
 '''
