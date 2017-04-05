@@ -200,17 +200,14 @@ frontal = [[-d, -d, -d],
 def setPattern(label):
     global ptList
     
-#    for pt in ptList:
-#        pt['circle'].remove()
-#        pt['rod'].pop(0).remove()
-#        pt['bead'].remove()
-#        plt.show()
-#        plt.pause(1)
-#        ptList = ptList[1:]
-#        updateWave()
-#       
-#    plt.show()
-#    plt.pause(.001)
+    for pt in ptList:
+        pt['circle'].remove()
+        pt['rod'].pop(0).remove()
+        pt['bead'].remove()
+        ptList = ptList[1:]
+    updateWave()
+    plt.show()
+    plt.pause(.001)
         
     rotate = True    
     if label == 'Clear':
