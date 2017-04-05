@@ -211,6 +211,12 @@ def setPattern(label):
         pt['rod'].pop(0).remove()
         pt['bead'].remove()
         ptList = ptList[1:]
+        
+    for line in lineList:
+        if line[0]:
+            line[0].remove()
+    lineList = []
+        
     updateWave()
     plt.show()
     plt.pause(.001)
