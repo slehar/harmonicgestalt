@@ -35,6 +35,8 @@ mute = False
 
 ptList = []
 lineList = []
+rotList = []
+line2DList = []
 selectedPt = None
 freqList = []
 buttonState = False
@@ -171,6 +173,12 @@ def addLine(pt1, pt2):
     z1, z2 = pt1[2], pt2[2]
     line = ax3d.plot([x1, x2], [y1, y2], [z1, z2], color='k', zdir='y')
     return line
+    
+def addLine2D(pt1, pt2):
+    x1, x2 = pt1[0], pt2[0]
+    y1, y2 = pt1[1], pt2[1]
+    line2D = axStim.plot([x1, x2], [y1, y2], color='k')
+    return line2D
 
 # Linear algebra to rotate frontal cube              
 
@@ -204,7 +212,7 @@ rotZ = [[cosZ, -sinZ, 0.],
 
 # radio button callback function to switch Necker pattern
 def setPattern(label):
-    global ptList, lineList, rotList
+    global ptList, lineList, rotList, line2DList
     
     for pt in ptList:
         pt['circle'].remove()
@@ -216,6 +224,10 @@ def setPattern(label):
         if line[0]:
             line[0].remove()
     lineList = []
+    for line2D in line2DList:
+        if line2D[0]:
+            line2D[0].remove()
+    line2DList = []
         
     updateWave()
     plt.show()
@@ -254,6 +266,21 @@ def setPattern(label):
         lineList.append(addLine(rotList[1], rotList[5]))            
         lineList.append(addLine(rotList[2], rotList[6]))            
         lineList.append(addLine(rotList[3], rotList[7]))            
+                
+        line2DList.append(addLine2D(rotList[0], rotList[1]))            
+        line2DList.append(addLine2D(rotList[1], rotList[2]))            
+        line2DList.append(addLine2D(rotList[2], rotList[3]))            
+        line2DList.append(addLine2D(rotList[3], rotList[0]))
+                
+        line2DList.append(addLine2D(rotList[4], rotList[5]))            
+        line2DList.append(addLine2D(rotList[5], rotList[6]))            
+        line2DList.append(addLine2D(rotList[6], rotList[7]))            
+        line2DList.append(addLine2D(rotList[7], rotList[4])) 
+               
+        line2DList.append(addLine2D(rotList[0], rotList[4]))            
+        line2DList.append(addLine2D(rotList[1], rotList[5]))            
+        line2DList.append(addLine2D(rotList[2], rotList[6]))            
+        line2DList.append(addLine2D(rotList[3], rotList[7]))            
                 
     plt.show()
     plt.pause(.001)
