@@ -252,31 +252,37 @@ def setPattern(label):
         for pt in rotList:
             addPoint(pt)
             
+        # Add 3-D lines from points 0 > 1 > 2 > 3 > 0 (front square)  
         lineList.append(addLine(rotList[0], rotList[1]))            
         lineList.append(addLine(rotList[1], rotList[2]))            
         lineList.append(addLine(rotList[2], rotList[3]))            
         lineList.append(addLine(rotList[3], rotList[0]))
                 
+        # Add 3-D lines from points 4 > 5 > 6 > 7 > 4 (back square)  
         lineList.append(addLine(rotList[4], rotList[5]))            
         lineList.append(addLine(rotList[5], rotList[6]))            
         lineList.append(addLine(rotList[6], rotList[7]))            
         lineList.append(addLine(rotList[7], rotList[4])) 
                
+        # Add 3-D lines from points 0 > 4, 1 > 5, 2 > 6, 3 > 7 (joining lines)  
         lineList.append(addLine(rotList[0], rotList[4]))            
         lineList.append(addLine(rotList[1], rotList[5]))            
         lineList.append(addLine(rotList[2], rotList[6]))            
         lineList.append(addLine(rotList[3], rotList[7]))            
                 
+        # Add 2-D projection from points 0 > 1 > 2 > 3 > 0 (front square)  
         line2DList.append(addLine2D(rotList[0], rotList[1]))            
         line2DList.append(addLine2D(rotList[1], rotList[2]))            
         line2DList.append(addLine2D(rotList[2], rotList[3]))            
         line2DList.append(addLine2D(rotList[3], rotList[0]))
                 
+        # Add 2-D projection from points 4 > 5 > 6 > 7 > 4 (back square)  
         line2DList.append(addLine2D(rotList[4], rotList[5]))            
         line2DList.append(addLine2D(rotList[5], rotList[6]))            
         line2DList.append(addLine2D(rotList[6], rotList[7]))            
         line2DList.append(addLine2D(rotList[7], rotList[4])) 
                
+       # Add 2-D projection from points0 > 4, 1 > 5, 2 > 6, 3 > 7 (joining lines)  
         line2DList.append(addLine2D(rotList[0], rotList[4]))            
         line2DList.append(addLine2D(rotList[1], rotList[5]))            
         line2DList.append(addLine2D(rotList[2], rotList[6]))            
