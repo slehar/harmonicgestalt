@@ -60,6 +60,8 @@ stream = pa.open(
 def updateWave():
     global data, fData, time, ptList, freqList, line
 
+    if len(ptList) == 0:
+        return
     freqList = []
     if len(ptList) < 2:
         fData = np.zeros(CHUNK, dtype=float)
@@ -148,54 +150,26 @@ ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 
 # Necker Radiobuttons
 rax = plt.axes([0.01, 0.35, 0.15/winAspect, 0.3])
-radio = RadioButtons(rax, ['Clear', 'Nek0', 'Nek1', 'Nek2', 'Nek3'])
+radio = RadioButtons(rax, ['Clear', 'Nek0', 'Nek1', 'Nek2'])
 
 def addPoint(xyz):
-    xPos, yPos = xyz[0], xyz[1]
+    xPos, yPos, zPos = xyz[0], xyz[1], xyz[2]
     circle = mpatches.Circle((xPos, yPos), ptRad)
     axStim.add_patch(circle)
     rod  = ax3d.plot([xPos, xPos], [-yPos, -yPos], [-1, 1], color='gray', zdir='y')
-    bead = ax3d.scatter([xPos], [-yPos], [0.], zdir='y', color='blue')
-    depth = xyz[2]
+    bead = ax3d.scatter([xPos], [-yPos], [zPos], zdir='y', color='blue')
     ptList.append({'xPos':xPos, 
                    'yPos':yPos, 
                    'selected':False,
                    'circle':circle, 
                    'rod':rod, 
                    'bead':bead, 
-                   'depth':depth})
+                   'depth':zPos})
                
-# Create zeroth point
-'''
-label = 'Pt %1d'%len(ptList)
-xPos, yPos = -.5, -.2
-circle = mpatches.Circle((xPos, yPos), ptRad)
-axStim.add_patch(circle)
-rod  = ax3d.plot([xPos, xPos], [-yPos, -yPos], [-1, 1], color='gray', zdir='y')
-bead = ax3d.scatter([xPos], [-yPos], [0.], zdir='y', color='blue')
-yOff = 0.; deltaY = -.03
-sliderAx = fig.add_axes([.6, .15+yOff, .6/winAspect, .02])
-yOff += deltaY
-sliderAx.set_xticks([]); sliderAx.set_yticks([])
-slider = Slider(sliderAx, label, -1., 1., valinit=0.)
-depth = slider.val
-
-ptList.append({'label':label, 
-               'xPos':xPos, 
-               'yPos':yPos, 
-               'selected':False,
-               'circle':circle, 
-               'rod':rod, 
-               'bead':bead, 
-               'depth':depth,
-               'sliderAx':sliderAx, 
-               'slider':slider,})
-'''
-
 d = .7
-aX = np.radians(45.)
-aY = np.radians(45.)
-aZ = np.radians(45.)
+aX = np.radians(10.)
+aY = np.radians(10.)
+aZ = np.radians(10.)
 
 cosX, sinX = np.cos(aX), np.sin(aX)
 cosY, sinY = np.cos(aY), np.sin(aY)
@@ -213,36 +187,53 @@ rotZ = [[cosZ, -sinZ, 0.],
         [sinZ,  cosZ,  0.],
         [  0.,    0.,  1.]]
 
+frontal = [[-d, -d, -d],
+           [ d, -d, -d],
+           [ d,  d, -d],
+           [-d,  d, -d],
+           [-d, -d,  d],
+           [ d, -d,  d],
+           [ d,  d,  d],
+           [-d,  d,  d]]
+           
+
 
 # radio button callback function to switch Necker pattern
 def setPattern(label):
     global ptList
     
-    if   label == 'Clear':
-        print 'Clear'
-        ptList = []  
-    else:
-        frontal = [[-d, -d, -d],
-                   [ d, -d, -d],
-                   [ d,  d, -d],
-                   [-d,  d, -d],
-                   [-d, -d,  d],
-                   [ d, -d,  d],
-                   [ d,  d,  d],
-                   [-d,  d,  d]]
+    for pt in ptList:
+        pt['circle'].remove()
+        pt['rod'].pop(0).remove()
+        pt['bead'].remove()
+        plt.show()
+        plt.pause(1)
+        ptList = ptList[1:]
+        updateWave()
         
-        if label == 'Nek0':
-            print 'Nek0'
-            rotList = np.matmul(frontal, rotY)
-        elif label == 'Nek1':
-            print 'Nek1'
-        elif label == 'Nek2':
-            print 'Nek2'
-        elif label == 'Nek3':
-            print 'Nek3'
-            
-        for pt in rotList:
-            addPoint(pt)
+    plt.show()
+    plt.pause(.001)
+        
+    if label == 'Clear':
+        print 'Clear'
+        rotList = []
+        for circ in axStim.patches:
+            circ.remove()
+        for collec in ax3d.collections:
+            collec.remove()
+
+    elif label == 'Nek0':
+        print 'Nek0'
+        rotList = np.matmul(frontal, rotY)
+    elif label == 'Nek1':
+        print 'Nek1'
+        rotList = np.matmul(frontal, rotY)
+    elif label == 'Nek2':
+        print 'Nek2'
+        rotList = np.matmul(frontal, rotX)
+        
+    for pt in rotList:
+        addPoint(pt)
     plt.show()
     plt.pause(.001)
     updateWave()
@@ -324,16 +315,9 @@ def on_press(event):
 
         rod  = ax3d.plot([xdata, xdata], [-ydata, -ydata], [-1, 1], color='gray', zdir='y')
         bead = ax3d.scatter([xdata], [-ydata], [0.], zdir='y', color='blue')
-#        sliderAx = fig.add_axes([.6, .15+yOff, .6/winAspect, .02])
-#        yOff += deltaY
-#        sliderAx.set_xticks([]); sliderAx.set_yticks([])
-#        slider = Slider(sliderAx, label, -1., 1., valinit=0.)
-#        depth = slider.val
-#        slider.on_changed(updateSliders)
         depth = 0.
 
-        ptList.append({'label':label,
-                       'xPos':xdata, 
+        ptList.append({'xPos':xdata, 
                        'yPos':ydata, 
                        'selected':False,
                        'circle':circle, 
