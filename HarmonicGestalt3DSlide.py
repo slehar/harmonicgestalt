@@ -164,10 +164,9 @@ def addPoint(xyz):
                    'bead':bead, 
                    'depth':zPos})
                
-d = .7
-aX = np.radians(10.)
-aY = np.radians(10.)
-aZ = np.radians(10.)
+aX = np.radians(22.)
+aY = np.radians(22.)
+aZ = np.radians(22.)
 
 cosX, sinX = np.cos(aX), np.sin(aX)
 cosY, sinY = np.cos(aY), np.sin(aY)
@@ -185,6 +184,7 @@ rotZ = [[cosZ, -sinZ, 0.],
         [sinZ,  cosZ,  0.],
         [  0.,    0.,  1.]]
 
+d = .5
 frontal = [[-d, -d, -d],
            [ d, -d, -d],
            [ d,  d, -d],
@@ -194,8 +194,6 @@ frontal = [[-d, -d, -d],
            [ d,  d,  d],
            [-d,  d,  d]]
            
-
-
 # radio button callback function to switch Necker pattern
 def setPattern(label):
     global ptList
@@ -209,29 +207,27 @@ def setPattern(label):
     plt.show()
     plt.pause(.001)
         
-    rotate = True    
     if label == 'Clear':
         print 'Clear'
-        for pt in ptList:
-            pt['circle'].remove()
-            pt['rod'].pop(0).remove()
-            pt['bead'].remove()
-            ptList = ptList[1:]
+#        for pt in ptList:
+#            pt['circle'].remove()
+#            pt['rod'].pop(0).remove()
+#            pt['bead'].remove()
+#            ptList = ptList[1:]
         rotList = []
         ptList = []
-        rotate = False
 
     elif label == 'Nek0':
         print 'Nek0'
-        rotList = np.matmul(frontal, rotY)
+        rotList = np.matmul(frontal, rotX)
     elif label == 'Nek1':
         print 'Nek1'
         rotList = np.matmul(frontal, rotY)
     elif label == 'Nek2':
         print 'Nek2'
-        rotList = np.matmul(frontal, rotX)
+        rotList = np.matmul(frontal, rotZ)
 
-    if rotate:        
+    if len(rotList) > 0:        
         for pt in rotList:
             addPoint(pt)
     plt.show()
