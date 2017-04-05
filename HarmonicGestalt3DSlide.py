@@ -166,9 +166,9 @@ def addPoint(xyz):
                    'depth':zPos})
 
 def addLine(pt1, pt2):
-    x1, x2 = pt1['xPos'], pt2['xPos']
-    y1, y2 = pt1['yPos'], pt2['yPos']
-    z1, z2 = pt1['depth'],pt2['depth']
+    x1, x2 = pt1[0], pt2[0]
+    y1, y2 = pt1[1], pt2[1]
+    z1, z2 = pt1[2], pt2[2]
     line = ax3d.plot([x1, x2], [y1, y2], [z1, z2], color='k', zdir='y')
     return line
 
@@ -204,7 +204,7 @@ rotZ = [[cosZ, -sinZ, 0.],
 
 # radio button callback function to switch Necker pattern
 def setPattern(label):
-    global ptList, lineList
+    global ptList, lineList, rotList
     
     for pt in ptList:
         pt['circle'].remove()
@@ -234,8 +234,21 @@ def setPattern(label):
         for pt in rotList:
             addPoint(pt)
             
-    lineList.append(addLine(ptList[0], ptList[1]))            
-            
+        lineList.append(addLine(rotList[0], rotList[1]))            
+        lineList.append(addLine(rotList[1], rotList[2]))            
+        lineList.append(addLine(rotList[2], rotList[3]))            
+        lineList.append(addLine(rotList[3], rotList[0]))
+                
+        lineList.append(addLine(rotList[4], rotList[5]))            
+        lineList.append(addLine(rotList[5], rotList[6]))            
+        lineList.append(addLine(rotList[6], rotList[7]))            
+        lineList.append(addLine(rotList[7], rotList[4])) 
+               
+        lineList.append(addLine(rotList[0], rotList[4]))            
+        lineList.append(addLine(rotList[1], rotList[5]))            
+        lineList.append(addLine(rotList[2], rotList[6]))            
+        lineList.append(addLine(rotList[3], rotList[7]))            
+                
     plt.show()
     plt.pause(.001)
     updateWave()
