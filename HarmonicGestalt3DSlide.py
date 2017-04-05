@@ -60,8 +60,6 @@ stream = pa.open(
 def updateWave():
     global data, fData, time, ptList, freqList, line
 
-    if len(ptList) == 0:
-        return
     freqList = []
     if len(ptList) < 2:
         fData = np.zeros(CHUNK, dtype=float)
@@ -202,18 +200,19 @@ frontal = [[-d, -d, -d],
 def setPattern(label):
     global ptList
     
-    for pt in ptList:
-        pt['circle'].remove()
-        pt['rod'].pop(0).remove()
-        pt['bead'].remove()
-        plt.show()
-        plt.pause(1)
-        ptList = ptList[1:]
-        updateWave()
+#    for pt in ptList:
+#        pt['circle'].remove()
+#        pt['rod'].pop(0).remove()
+#        pt['bead'].remove()
+#        plt.show()
+#        plt.pause(1)
+#        ptList = ptList[1:]
+#        updateWave()
+#       
+#    plt.show()
+#    plt.pause(.001)
         
-    plt.show()
-    plt.pause(.001)
-        
+    rotate = True    
     if label == 'Clear':
         print 'Clear'
         for pt in ptList:
@@ -223,6 +222,7 @@ def setPattern(label):
             ptList = ptList[1:]
         rotList = []
         ptList = []
+        rotate = False
 
     elif label == 'Nek0':
         print 'Nek0'
@@ -233,9 +233,10 @@ def setPattern(label):
     elif label == 'Nek2':
         print 'Nek2'
         rotList = np.matmul(frontal, rotX)
-        
-    for pt in rotList:
-        addPoint(pt)
+
+    if rotate:        
+        for pt in rotList:
+            addPoint(pt)
     plt.show()
     plt.pause(.001)
     updateWave()
