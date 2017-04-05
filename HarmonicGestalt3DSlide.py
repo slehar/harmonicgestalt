@@ -216,11 +216,13 @@ def setPattern(label):
         
     if label == 'Clear':
         print 'Clear'
+        for pt in ptList:
+            pt['circle'].remove()
+            pt['rod'].pop(0).remove()
+            pt['bead'].remove()
+            ptList = ptList[1:]
         rotList = []
-        for circ in axStim.patches:
-            circ.remove()
-        for collec in ax3d.collections:
-            collec.remove()
+        ptList = []
 
     elif label == 'Nek0':
         print 'Nek0'
