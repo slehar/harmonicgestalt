@@ -34,6 +34,7 @@ plotData = np.zeros_like(plotTime)
 mute = False
 
 ptList = []
+lineList = []
 selectedPt = None
 freqList = []
 buttonState = False
@@ -163,10 +164,27 @@ def addPoint(xyz):
                    'rod':rod, 
                    'bead':bead, 
                    'depth':zPos})
-               
-aX = np.radians(22.)
-aY = np.radians(22.)
-aZ = np.radians(22.)
+
+def addLine(pt1, pt2):
+    x1, x2 = pt1['xPos'], pt2['xPos']
+    y1, y2 = pt1['yPos'], pt2['yPos']
+    z1, z2 = pt1['depth'],pt2['depth']
+    line = ax3d.plot([x1, x2], [y1, y2], [z1, z2], color='k', zdir='y')
+    return line
+
+# Linear algebra to rotate frontal cube              
+
+d = .5
+frontal = [[-d, -d, -d],
+           [ d, -d, -d],
+           [ d,  d, -d],
+           [-d,  d, -d],
+           [-d, -d,  d],
+           [ d, -d,  d],
+           [ d,  d,  d],
+           [-d,  d,  d]]
+           
+aX, aY, aZ = np.radians(22.), np.radians(22.), np.radians(22.)
 
 cosX, sinX = np.cos(aX), np.sin(aX)
 cosY, sinY = np.cos(aY), np.sin(aY)
@@ -184,19 +202,9 @@ rotZ = [[cosZ, -sinZ, 0.],
         [sinZ,  cosZ,  0.],
         [  0.,    0.,  1.]]
 
-d = .5
-frontal = [[-d, -d, -d],
-           [ d, -d, -d],
-           [ d,  d, -d],
-           [-d,  d, -d],
-           [-d, -d,  d],
-           [ d, -d,  d],
-           [ d,  d,  d],
-           [-d,  d,  d]]
-           
 # radio button callback function to switch Necker pattern
 def setPattern(label):
-    global ptList
+    global ptList, lineList
     
     for pt in ptList:
         pt['circle'].remove()
@@ -209,11 +217,6 @@ def setPattern(label):
         
     if label == 'Clear':
         print 'Clear'
-#        for pt in ptList:
-#            pt['circle'].remove()
-#            pt['rod'].pop(0).remove()
-#            pt['bead'].remove()
-#            ptList = ptList[1:]
         rotList = []
         ptList = []
 
@@ -230,6 +233,9 @@ def setPattern(label):
     if len(rotList) > 0:        
         for pt in rotList:
             addPoint(pt)
+            
+    lineList.append(addLine(ptList[0], ptList[1]))            
+            
     plt.show()
     plt.pause(.001)
     updateWave()
