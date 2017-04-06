@@ -150,8 +150,8 @@ poly2.set_edgecolor('k')
 ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 
 # Necker Radiobuttons
-rax = plt.axes([0.01, 0.35, 0.15/winAspect, 0.3])
-radio = RadioButtons(rax, ['Clear', 'Nek0', 'Nek1', 'Nek2'])
+rax = plt.axes([0.005, 0.25, 0.16/winAspect, 0.4])
+radio = RadioButtons(rax, ['Clear', 'Nek0', 'Nek1', 'Nek2', 'Nek3', 'Nek4'])
 
 def addPoint(xyz):
     xPos, yPos, zPos = xyz[0], xyz[1], xyz[2]
@@ -285,9 +285,16 @@ def setPattern(label):
         rotList = frontal
     elif label == 'Nek1':
         rotList = rotateY(frontal,  -22)
-    elif label == 'Nek2':
-        rotList = rotateY(frontal,  22)
         rotList = rotateX(rotList,  22)
+    elif label == 'Nek2':
+        rotList = rotateY(frontal,  -45)
+        rotList = rotateX(rotList,   45)
+    elif label == 'Nek3':
+        rotList = rotateY(frontal,  -45)
+        rotList = rotateX(rotList,   30)
+    elif label == 'Nek4':
+        rotList = rotateY(frontal,  -45)
+        rotList = rotateX(rotList,   35.2)
 
     if len(rotList) > 0:        
         for pt in rotList:
