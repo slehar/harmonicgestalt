@@ -159,19 +159,15 @@ def addPoint(xyz):
     axStim.add_patch(circle)
     rod  = ax3d.plot([xPos, xPos], [-yPos, -yPos], [-1, 1], color='gray', zdir='y')
     bead = ax3d.scatter([xPos], [-yPos], [zPos], zdir='y', color='blue')
-
-
-    bead.set_offsets([xdata, -ydata])
+    bead.set_offsets([xPos, -yPos])
     bead.set_3d_properties(zPos, zdir='y')
-
-
     ptList.append({'xPos':xPos, 
                    'yPos':yPos, 
+                   'zPos':zPos,
                    'selected':False,
                    'circle':circle, 
                    'rod':rod, 
-                   'bead':bead, 
-                   'zPos':zPos})
+                   'bead':bead})
 
 def addLine(pt1, pt2, color='k'):
     x1, x2 = pt1[0], pt2[0]
@@ -197,48 +193,7 @@ frontal = [[-d, -d, -d],
            [ d, -d,  d],
            [ d,  d,  d],
            [-d,  d,  d]]
-           
-aX, aY, aZ = np.radians(45.), np.radians(45.), np.radians(45.)
-
-cosX, sinX = np.cos(aX), np.sin(aX)
-cosY, sinY = np.cos(aY), np.sin(aY)
-cosZ, sinZ = np.cos(aZ), np.sin(aZ)
-
-rotX = [[1,       0.,    0.],
-        [0,     cosX, -sinX],
-        [0,     sinX,  cosX]]
         
-rotY = [[ cosY,   0.,  sinY],
-        [   0.,   1.,    0.],
-        [-sinY,   0.,  cosY]]
-        
-rotZ = [[cosZ, -sinZ, 0.],
-        [sinZ,  cosZ,  0.],
-        [  0.,    0.,  1.]]
-        
-def rotateCube(frontal, aX, aY, aZ):
-    
-    cosX, sinX = np.cos(np.deg2rad(aX)), np.sin(np.deg2rad(aX))
-    cosY, sinY = np.cos(np.deg2rad(aY)), np.sin(np.deg2rad(aY))
-    cosZ, sinZ = np.cos(np.deg2rad(aZ)), np.sin(np.deg2rad(aZ))
-    
-    rotX = [[1,       0.,    0.],
-            [0,     cosX, -sinX],
-            [0,     sinX,  cosX]]
-            
-    rotY = [[ cosY,   0.,  sinY],
-            [   0.,   1.,    0.],
-            [-sinY,   0.,  cosY]]
-            
-    rotZ = [[cosZ, -sinZ, 0.],
-            [sinZ,  cosZ,  0.],
-            [  0.,    0.,  1.]]
-            
-    turnY = np.matmul(frontal,   rotY)
-    turnX = np.matmul(turnY, rotX)
-    turnZ = np.matmul(turnX,   rotZ)
-    return turnZ
-
 def rotateX(cube, aX):    
     cosX, sinX = np.cos(np.deg2rad(aX)), np.sin(np.deg2rad(aX))    
     rotX = [[1,       0.,    0.],
@@ -252,6 +207,13 @@ def rotateY(cube, aY):
             [   0.,   1.,    0.],
             [-sinY,   0.,  cosY]]            
     return np.matmul(cube, rotY)
+
+def rotateZ(cube, aZ):    
+    cosZ, sinZ = np.cos(np.deg2rad(aZ)), np.sin(np.deg2rad(aZ))    
+    rotZ = [[cosZ, -sinZ, 0.],
+            [sinZ,  cosZ,  0.],
+            [  0.,    0.,  1.]]
+    return np.matmul(cube, rotZ)
 
 
 # radio button callback function to switch Necker pattern
@@ -336,7 +298,6 @@ def setPattern(label):
         line2DList.append(addLine2D(rotList[2], rotList[6]))            
         line2DList.append(addLine2D(rotList[3], rotList[7]))    
         
-                
     plt.show()
     plt.pause(.001)
     updateWave()
