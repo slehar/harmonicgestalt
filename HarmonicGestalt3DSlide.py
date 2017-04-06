@@ -173,17 +173,17 @@ def addPoint(xyz):
                    'bead':bead, 
                    'zPos':zPos})
 
-def addLine(pt1, pt2):
+def addLine(pt1, pt2, color='k'):
     x1, x2 = pt1[0], pt2[0]
     y1, y2 = pt1[1], pt2[1]
     z1, z2 = pt1[2], pt2[2]
-    line = ax3d.plot([x1, x2], [y1, y2], [z1, z2], color='k', zdir='y')
+    line = ax3d.plot([x1, x2], [y1, y2], [z1, z2], color=color, zdir='y')
     return line
     
-def addLine2D(pt1, pt2):
+def addLine2D(pt1, pt2, color='k'):
     x1, x2 = pt1[0], pt2[0]
     y1, y2 = pt1[1], pt2[1]
-    line2D = axStim.plot([x1, x2], [y1, y2], color='k')
+    line2D = axStim.plot([x1, x2], [y1, y2], color=color)
     return line2D
 
 # Linear algebra to rotate frontal cube              
@@ -234,10 +234,31 @@ def rotateCube(frontal, aX, aY, aZ):
             [sinZ,  cosZ,  0.],
             [  0.,    0.,  1.]]
             
-    turnX = np.matmul(frontal, rotX)
-    turnY = np.matmul(turnX,   rotY)
-    turnZ = np.matmul(turnY,   rotZ)
+    turnY = np.matmul(frontal,   rotY)
+    turnX = np.matmul(turnY, rotX)
+    turnZ = np.matmul(turnX,   rotZ)
     return turnZ
+
+def rotateX(cube, aX):
+    
+    cosX, sinX = np.cos(aX), np.sin(aX)
+    
+    rotX = [[1,       0.,    0.],
+            [0,     cosX, -sinX],
+            [0,     sinX,  cosX]]
+                        
+    return np.matmul(cube, rotX)
+    
+def rotateY(cube, aY):
+    
+    cosY, sinY = np.cos(aY), np.sin(aY)
+    
+    rotY = [[ cosY,   0.,  sinY],
+            [   0.,   1.,    0.],
+            [-sinY,   0.,  cosY]]
+            
+    return np.matmul(cube, rotY)
+
 
 # radio button callback function to switch Necker pattern
 def setPattern(label):
@@ -263,32 +284,26 @@ def setPattern(label):
     plt.pause(.001)
         
     if label == 'Clear':
-        print 'Clear'
         rotList = []
         ptList = []
 
     elif label == 'Nek0':
-        print 'Nek0'
-#        rotList = np.matmul(frontal, rotX)
-        rotList = rotateCube(frontal, 30, 30, 0)
+        rotList = rotateY(frontal,  5)
     elif label == 'Nek1':
-        print 'Nek1'
-#        rotList = np.matmul(frontal, rotY)
-        rotList = rotateCube(frontal, 45, 30, 0)
+        rotList = rotateY(frontal,  5)
+        rotList = rotateX(rotList,  5)
     elif label == 'Nek2':
-        print 'Nek2'
-#        rotList = np.matmul(frontal, rotZ)
-        rotList = rotateCube(frontal, 45, 45, 0)
+        rotList = rotateCube(frontal,  45,  45, 0)
 
     if len(rotList) > 0:        
         for pt in rotList:
             addPoint(pt)
             
         # Add 3-D lines from points 0 > 1 > 2 > 3 > 0 (front square)  
-        lineList.append(addLine(rotList[0], rotList[1]))            
-        lineList.append(addLine(rotList[1], rotList[2]))            
-        lineList.append(addLine(rotList[2], rotList[3]))            
-        lineList.append(addLine(rotList[3], rotList[0]))
+        lineList.append(addLine(rotList[0], rotList[1], color='r'))            
+        lineList.append(addLine(rotList[1], rotList[2], color='r'))            
+        lineList.append(addLine(rotList[2], rotList[3], color='r'))            
+        lineList.append(addLine(rotList[3], rotList[0], color='r'))
                 
         # Add 3-D lines from points 4 > 5 > 6 > 7 > 4 (back square)  
         lineList.append(addLine(rotList[4], rotList[5]))            
@@ -303,10 +318,10 @@ def setPattern(label):
         lineList.append(addLine(rotList[3], rotList[7]))            
                 
         # Add 2-D projection from points 0 > 1 > 2 > 3 > 0 (front square)  
-        line2DList.append(addLine2D(rotList[0], rotList[1]))            
-        line2DList.append(addLine2D(rotList[1], rotList[2]))            
-        line2DList.append(addLine2D(rotList[2], rotList[3]))            
-        line2DList.append(addLine2D(rotList[3], rotList[0]))
+        line2DList.append(addLine2D(rotList[0], rotList[1], color='r'))            
+        line2DList.append(addLine2D(rotList[1], rotList[2], color='r'))            
+        line2DList.append(addLine2D(rotList[2], rotList[3], color='r'))            
+        line2DList.append(addLine2D(rotList[3], rotList[0], color='r'))
                 
         # Add 2-D projection from points 4 > 5 > 6 > 7 > 4 (back square)  
         line2DList.append(addLine2D(rotList[4], rotList[5]))            
