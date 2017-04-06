@@ -71,7 +71,7 @@ def updateWave():
     elif len(ptList) == 2:
         dist = np.sqrt((ptList[0]['xPos']  - ptList[1]['xPos'])**2. +
                        (ptList[0]['yPos']  - ptList[1]['yPos'])**2. +
-                       (ptList[0]['depth'] - ptList[1]['depth'])**2.)
+                       (ptList[0]['zPos'] - ptList[1]['zPos'])**2.)
         freqList.append(int(BASEFREQ/dist))
     else:
         for point1 in ptList:
@@ -79,7 +79,7 @@ def updateWave():
                 if point1 is not point2:
                     dist = np.sqrt((point1['xPos']  - point2['xPos'])**2. +
                                    (point1['yPos']  - point2['yPos'])**2. +
-                                   (point1['depth'] - point2['depth'])**2.)
+                                   (point1['zPos'] - point2['zPos'])**2.)
                     freqList.append(int(BASEFREQ/dist))
                                         
     fData = np.zeros(CHUNK, dtype=float)
@@ -159,13 +159,19 @@ def addPoint(xyz):
     axStim.add_patch(circle)
     rod  = ax3d.plot([xPos, xPos], [-yPos, -yPos], [-1, 1], color='gray', zdir='y')
     bead = ax3d.scatter([xPos], [-yPos], [zPos], zdir='y', color='blue')
+
+
+    bead.set_offsets([xdata, -ydata])
+    bead.set_3d_properties(zPos, zdir='y')
+
+
     ptList.append({'xPos':xPos, 
                    'yPos':yPos, 
                    'selected':False,
                    'circle':circle, 
                    'rod':rod, 
                    'bead':bead, 
-                   'depth':zPos})
+                   'zPos':zPos})
 
 def addLine(pt1, pt2):
     x1, x2 = pt1[0], pt2[0]
@@ -192,7 +198,7 @@ frontal = [[-d, -d, -d],
            [ d,  d,  d],
            [-d,  d,  d]]
            
-aX, aY, aZ = np.radians(22.), np.radians(22.), np.radians(22.)
+aX, aY, aZ = np.radians(45.), np.radians(45.), np.radians(45.)
 
 cosX, sinX = np.cos(aX), np.sin(aX)
 cosY, sinY = np.cos(aY), np.sin(aY)
@@ -209,17 +215,40 @@ rotY = [[ cosY,   0.,  sinY],
 rotZ = [[cosZ, -sinZ, 0.],
         [sinZ,  cosZ,  0.],
         [  0.,    0.,  1.]]
+        
+def rotateCube(frontal, aX, aY, aZ):
+    
+    cosX, sinX = np.cos(aX), np.sin(aX)
+    cosY, sinY = np.cos(aY), np.sin(aY)
+    cosZ, sinZ = np.cos(aZ), np.sin(aZ)
+    
+    rotX = [[1,       0.,    0.],
+            [0,     cosX, -sinX],
+            [0,     sinX,  cosX]]
+            
+    rotY = [[ cosY,   0.,  sinY],
+            [   0.,   1.,    0.],
+            [-sinY,   0.,  cosY]]
+            
+    rotZ = [[cosZ, -sinZ, 0.],
+            [sinZ,  cosZ,  0.],
+            [  0.,    0.,  1.]]
+            
+    turnX = np.matmul(frontal, rotX)
+    turnY = np.matmul(turnX,   rotY)
+    turnZ = np.matmul(turnY,   rotZ)
+    return turnZ
 
 # radio button callback function to switch Necker pattern
 def setPattern(label):
     global ptList, lineList, rotList, line2DList
     
+    # clear points, lines, and 2D lines
     for pt in ptList:
         pt['circle'].remove()
         pt['rod'].pop(0).remove()
         pt['bead'].remove()
         ptList = ptList[1:]
-        
     for line in lineList:
         if line[0]:
             line[0].remove()
@@ -240,13 +269,16 @@ def setPattern(label):
 
     elif label == 'Nek0':
         print 'Nek0'
-        rotList = np.matmul(frontal, rotX)
+#        rotList = np.matmul(frontal, rotX)
+        rotList = rotateCube(frontal, 30, 30, 0)
     elif label == 'Nek1':
         print 'Nek1'
-        rotList = np.matmul(frontal, rotY)
+#        rotList = np.matmul(frontal, rotY)
+        rotList = rotateCube(frontal, 45, 30, 0)
     elif label == 'Nek2':
         print 'Nek2'
-        rotList = np.matmul(frontal, rotZ)
+#        rotList = np.matmul(frontal, rotZ)
+        rotList = rotateCube(frontal, 45, 45, 0)
 
     if len(rotList) > 0:        
         for pt in rotList:
@@ -286,7 +318,8 @@ def setPattern(label):
         line2DList.append(addLine2D(rotList[0], rotList[4]))            
         line2DList.append(addLine2D(rotList[1], rotList[5]))            
         line2DList.append(addLine2D(rotList[2], rotList[6]))            
-        line2DList.append(addLine2D(rotList[3], rotList[7]))            
+        line2DList.append(addLine2D(rotList[3], rotList[7]))    
+        
                 
     plt.show()
     plt.pause(.001)
@@ -377,7 +410,7 @@ def on_press(event):
                        'circle':circle, 
                        'rod':rod, 
                        'bead':bead, 
-                       'depth':depth})
+                       'zPos':depth})
                
         selectedPt = ptList[-1]
         updateWave()
@@ -415,7 +448,7 @@ def on_motion(event):
         selectedPt['rod'][0].set_ydata([-ydata, -ydata])
         selectedPt['rod'][0].set_3d_properties([-1, 1], zdir='y')
         selectedPt['bead'].set_offsets([xdata, -ydata])
-        selectedPt['bead'].set_3d_properties(ptList[0]['depth'], zdir='y')
+        selectedPt['bead'].set_3d_properties(ptList[0]['zPos'], zdir='y')
         plt.pause(.001)
 #        fig.canvas.draw()
         updateWave()
