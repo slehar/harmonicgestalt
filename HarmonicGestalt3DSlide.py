@@ -129,12 +129,21 @@ ax3d.set_xlim3d(-1, 1)
 ax3d.set_ylim3d(-1, 1)
 ax3d.set_zlim3d(1, -1)
 
+#### Slider Axes ####
+axSl = fig.add_axes([.55, .05, .4, .05])
+axSl.axes.set_xticks([])
+axSl.axes.set_yticks([])
+
+slider1 = Slider(axSl, 'depth', -2., 2., valinit=0.)
+depth = slider1.val
+
+
 # Back plane
 verts3D = np.array([[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[-1,-1,1]])
 vertsXY = [verts3D[:,:2]]
 vertsZ  = verts3D[:,2]
 poly1 = PolyCollection(vertsXY)
-poly1.set_alpha(0.7)
+poly1.set_alpha(0.2)
 poly1.set_color('w')
 poly1.set_edgecolor('k')
 ax3d.add_collection3d(poly1, zs=vertsZ, zdir='y')
@@ -144,7 +153,7 @@ verts3D = np.array([[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,-1]])
 vertsXY = [verts3D[:,:2]]
 vertsZ  = verts3D[:,2]
 poly2 = PolyCollection(vertsXY)
-poly2.set_alpha(0.7)
+poly2.set_alpha(0.5)
 poly2.set_color('w')
 poly2.set_edgecolor('k')
 ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
