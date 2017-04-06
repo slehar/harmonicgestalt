@@ -157,7 +157,8 @@ def addPoint(xyz):
     xPos, yPos, zPos = xyz[0], xyz[1], xyz[2]
     circle = mpatches.Circle((xPos, yPos), ptRad)
     axStim.add_patch(circle)
-    rod  = ax3d.plot([xPos, xPos], [-yPos, -yPos], [-1, 1], color='gray', zdir='y')
+#    rod  = ax3d.plot([xPos, xPos], [-yPos, -yPos], [-1, 1], color='gray', zdir='y')
+    rod  = ax3d.plot([xPos, xPos], [yPos, yPos], [-1, 1], color='gray', zdir='y')
     bead = ax3d.scatter([xPos], [-yPos], [zPos], zdir='y', color='blue')
     bead.set_offsets([xPos, yPos])
     bead.set_3d_properties(zPos, zdir='y')
