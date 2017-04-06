@@ -218,9 +218,9 @@ rotZ = [[cosZ, -sinZ, 0.],
         
 def rotateCube(frontal, aX, aY, aZ):
     
-    cosX, sinX = np.cos(aX), np.sin(aX)
-    cosY, sinY = np.cos(aY), np.sin(aY)
-    cosZ, sinZ = np.cos(aZ), np.sin(aZ)
+    cosX, sinX = np.cos(np.deg2rad(aX)), np.sin(np.deg2rad(aX))
+    cosY, sinY = np.cos(np.deg2rad(aY)), np.sin(np.deg2rad(aY))
+    cosZ, sinZ = np.cos(np.deg2rad(aZ)), np.sin(np.deg2rad(aZ))
     
     rotX = [[1,       0.,    0.],
             [0,     cosX, -sinX],
@@ -239,24 +239,18 @@ def rotateCube(frontal, aX, aY, aZ):
     turnZ = np.matmul(turnX,   rotZ)
     return turnZ
 
-def rotateX(cube, aX):
-    
-    cosX, sinX = np.cos(aX), np.sin(aX)
-    
+def rotateX(cube, aX):    
+    cosX, sinX = np.cos(np.deg2rad(aX)), np.sin(np.deg2rad(aX))    
     rotX = [[1,       0.,    0.],
             [0,     cosX, -sinX],
-            [0,     sinX,  cosX]]
-                        
+            [0,     sinX,  cosX]]                        
     return np.matmul(cube, rotX)
     
-def rotateY(cube, aY):
-    
-    cosY, sinY = np.cos(aY), np.sin(aY)
-    
+def rotateY(cube, aY):    
+    cosY, sinY = np.cos(np.deg2rad(aY)), np.sin(np.deg2rad(aY))    
     rotY = [[ cosY,   0.,  sinY],
             [   0.,   1.,    0.],
-            [-sinY,   0.,  cosY]]
-            
+            [-sinY,   0.,  cosY]]            
     return np.matmul(cube, rotY)
 
 
@@ -288,12 +282,12 @@ def setPattern(label):
         ptList = []
 
     elif label == 'Nek0':
-        rotList = rotateY(frontal,  5)
+        rotList = frontal
     elif label == 'Nek1':
-        rotList = rotateY(frontal,  5)
-        rotList = rotateX(rotList,  5)
+        rotList = rotateY(frontal,  -22)
     elif label == 'Nek2':
-        rotList = rotateCube(frontal,  45,  45, 0)
+        rotList = rotateY(frontal,  22)
+        rotList = rotateX(rotList,  22)
 
     if len(rotList) > 0:        
         for pt in rotList:
