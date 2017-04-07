@@ -32,6 +32,7 @@ fData = np.sin(time)
 plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
 plotData = np.zeros_like(plotTime)
 mute = False
+depth = 0
 
 ptList = []
 lineList = []
@@ -137,7 +138,6 @@ axSl.axes.set_yticks([])
 slider1 = Slider(axSl, 'depth', -2., 2., valinit=0.)
 depth = slider1.val
 
-
 # Back plane
 verts3D = np.array([[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[-1,-1,1]])
 vertsXY = [verts3D[:,:2]]
@@ -192,7 +192,75 @@ def addLine2D(pt1, pt2, color='k'):
     line2D = axStim.plot([x1, x2], [y1, y2], color=color)
     return line2D
 
-# Linear algebra to rotate frontal cube              
+def update(depth):   
+    global rotList
+
+    print '\ndepth = %5.2f'%depth
+    
+    print '====[rotList]==='
+    print rotList
+    
+    scaList = rotList
+    scaList[:,2] *= depth
+    
+    print '====[scaList]==='
+    print scaList
+
+    if len(scaList) > 0:        
+        for pt in scaList:
+            addPoint(pt)
+            
+        # Add 3-D lines from points 0 > 1 > 2 > 3 > 0 (front square)  
+        lineList.append(addLine(scaList[0], scaList[1], color='r'))            
+        lineList.append(addLine(scaList[1], scaList[2], color='r'))            
+        lineList.append(addLine(scaList[2], scaList[3], color='r'))            
+        lineList.append(addLine(scaList[3], scaList[0], color='r'))
+                
+        # Add 3-D lines from points 4 > 5 > 6 > 7 > 4 (back square)  
+        lineList.append(addLine(scaList[4], scaList[5]))            
+        lineList.append(addLine(scaList[5], scaList[6]))            
+        lineList.append(addLine(scaList[6], scaList[7]))            
+        lineList.append(addLine(scaList[7], scaList[4])) 
+               
+        # Add 3-D lines from points 0 > 4, 1 > 5, 2 > 6, 3 > 7 (joining lines)  
+        lineList.append(addLine(scaList[0], scaList[4]))            
+        lineList.append(addLine(scaList[1], scaList[5]))            
+        lineList.append(addLine(scaList[2], scaList[6]))            
+        lineList.append(addLine(scaList[3], scaList[7]))            
+                
+        # Add 2-D projection from points 0 > 1 > 2 > 3 > 0 (front square)  
+        line2DList.append(addLine2D(scaList[0], scaList[1], color='r'))            
+        line2DList.append(addLine2D(scaList[1], scaList[2], color='r'))            
+        line2DList.append(addLine2D(scaList[2], scaList[3], color='r'))            
+        line2DList.append(addLine2D(scaList[3], scaList[0], color='r'))
+                
+        # Add 2-D projection from points 4 > 5 > 6 > 7 > 4 (back square)  
+        line2DList.append(addLine2D(scaList[4], scaList[5]))            
+        line2DList.append(addLine2D(scaList[5], scaList[6]))            
+        line2DList.append(addLine2D(scaList[6], scaList[7]))            
+        line2DList.append(addLine2D(scaList[7], scaList[4])) 
+               
+       # Add 2-D projection from points0 > 4, 1 > 5, 2 > 6, 3 > 7 (joining lines)  
+        line2DList.append(addLine2D(scaList[0], scaList[4]))            
+        line2DList.append(addLine2D(scaList[1], scaList[5]))            
+        line2DList.append(addLine2D(scaList[2], scaList[6]))            
+        line2DList.append(addLine2D(scaList[3], scaList[7]))    
+        
+    plt.show()
+    plt.pause(.001)
+    updateWave()
+    plt.draw()    
+
+def updateSl1(val):
+    global depth    
+    depth = slider1.val
+    update(depth)
+slider1.on_changed(updateSl1)
+
+
+
+
+# Frontal cube              
 
 d = .5
 frontal = [[-d, -d, -d],
@@ -267,63 +335,11 @@ def setPattern(label):
     elif label == 'Nek4':
         rotList = rotateY(frontal,  -45)
         rotList = rotateX(rotList,   35.2)
-
-    if len(rotList) > 0:        
-        for pt in rotList:
-            addPoint(pt)
-            
-        # Add 3-D lines from points 0 > 1 > 2 > 3 > 0 (front square)  
-        lineList.append(addLine(rotList[0], rotList[1], color='r'))            
-        lineList.append(addLine(rotList[1], rotList[2], color='r'))            
-        lineList.append(addLine(rotList[2], rotList[3], color='r'))            
-        lineList.append(addLine(rotList[3], rotList[0], color='r'))
-                
-        # Add 3-D lines from points 4 > 5 > 6 > 7 > 4 (back square)  
-        lineList.append(addLine(rotList[4], rotList[5]))            
-        lineList.append(addLine(rotList[5], rotList[6]))            
-        lineList.append(addLine(rotList[6], rotList[7]))            
-        lineList.append(addLine(rotList[7], rotList[4])) 
-               
-        # Add 3-D lines from points 0 > 4, 1 > 5, 2 > 6, 3 > 7 (joining lines)  
-        lineList.append(addLine(rotList[0], rotList[4]))            
-        lineList.append(addLine(rotList[1], rotList[5]))            
-        lineList.append(addLine(rotList[2], rotList[6]))            
-        lineList.append(addLine(rotList[3], rotList[7]))            
-                
-        # Add 2-D projection from points 0 > 1 > 2 > 3 > 0 (front square)  
-        line2DList.append(addLine2D(rotList[0], rotList[1], color='r'))            
-        line2DList.append(addLine2D(rotList[1], rotList[2], color='r'))            
-        line2DList.append(addLine2D(rotList[2], rotList[3], color='r'))            
-        line2DList.append(addLine2D(rotList[3], rotList[0], color='r'))
-                
-        # Add 2-D projection from points 4 > 5 > 6 > 7 > 4 (back square)  
-        line2DList.append(addLine2D(rotList[4], rotList[5]))            
-        line2DList.append(addLine2D(rotList[5], rotList[6]))            
-        line2DList.append(addLine2D(rotList[6], rotList[7]))            
-        line2DList.append(addLine2D(rotList[7], rotList[4])) 
-               
-       # Add 2-D projection from points0 > 4, 1 > 5, 2 > 6, 3 > 7 (joining lines)  
-        line2DList.append(addLine2D(rotList[0], rotList[4]))            
-        line2DList.append(addLine2D(rotList[1], rotList[5]))            
-        line2DList.append(addLine2D(rotList[2], rotList[6]))            
-        line2DList.append(addLine2D(rotList[3], rotList[7]))    
         
-    plt.show()
-    plt.pause(.001)
-    updateWave()
-    plt.draw()    
+    update(depth)
+    
 radio.on_clicked(setPattern)
 
-'''                                             
-def updateSliders(val):
-    for pt in ptList:
-        depth = pt['slider'].val
-        pt['depth'] = depth
-        pt['bead'].set_offsets([pt['xPos'], -pt['yPos']])
-        pt['bead'].set_3d_properties(depth, zdir='y')
-        updateWave()
-slider.on_changed(updateSliders)
-'''               
 
 #### Axes for spectrum ####
 axSpect = fig.add_axes([.1, .05/winAspect, .7/winAspect, .15])
