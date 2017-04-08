@@ -194,10 +194,29 @@ def addLine2D(pt1, pt2, color='k'):
     return line2D
 
 def update(depth):   
-    global rotList
+    global rotList, ptList, lineList, line2DList
     print '\n===[ in update ]===='
     print '\ndepth = %5.2f'%depth
     
+    # clear points, lines, and 2D lines
+    for pt in ptList:
+        pt['circle'].remove()
+        pt['rod'].pop(0).remove()
+        pt['bead'].remove()
+        ptList = ptList[1:]
+    for line in lineList:
+        if line[0]:
+            line[0].remove()
+    lineList = []
+    for line2D in line2DList:
+        if line2D[0]:
+            line2D[0].remove()
+    line2DList = []
+        
+    updateWave()
+    plt.show()
+    plt.pause(.001)
+        
     print '====[rotList]==='
     print rotList
     
@@ -307,25 +326,6 @@ def setPattern(label):
     print '\n===[ in setPattern ]===='
     print '\ndepth = %5.2f'%depth
 
-    # clear points, lines, and 2D lines
-    for pt in ptList:
-        pt['circle'].remove()
-        pt['rod'].pop(0).remove()
-        pt['bead'].remove()
-        ptList = ptList[1:]
-    for line in lineList:
-        if line[0]:
-            line[0].remove()
-    lineList = []
-    for line2D in line2DList:
-        if line2D[0]:
-            line2D[0].remove()
-    line2DList = []
-        
-    updateWave()
-    plt.show()
-    plt.pause(.001)
-        
     if label == 'Clear':
         rotList = []
         ptList = []
