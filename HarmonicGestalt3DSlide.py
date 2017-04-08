@@ -99,7 +99,8 @@ def updateWave():
 
 
 ####### Open figure and set axes 1 for drawing Artists ########
-figYSize, figXSize = (15,8)
+#figYSize, figXSize = (15,8)
+figYSize, figXSize = (12,6)
 winAspect = float(figYSize)/float(figXSize)
 plt.close('all')
 fig = plt.figure(figsize=(figYSize,figXSize))
@@ -194,14 +195,17 @@ def addLine2D(pt1, pt2, color='k'):
 
 def update(depth):   
     global rotList
-
+    print '\n===[ in update ]===='
     print '\ndepth = %5.2f'%depth
     
     print '====[rotList]==='
     print rotList
     
-    scaList = rotList
-    scaList[:,2] *= depth
+    if len(rotList) > 0:
+        scaList = np.array(rotList)
+        scaList[:,2] *= depth
+    else: 
+        scaList = np.array([])
     
     print '====[scaList]==='
     print scaList
@@ -253,6 +257,8 @@ def update(depth):
 
 def updateSl1(val):
     global depth    
+    print '\n===[ in updateSl1 ]===='
+    print '\ndepth = %5.2f'%depth
     depth = slider1.val
     update(depth)
 slider1.on_changed(updateSl1)
@@ -298,6 +304,9 @@ def rotateZ(cube, aZ):
 def setPattern(label):
     global ptList, lineList, rotList, line2DList
     
+    print '\n===[ in setPattern ]===='
+    print '\ndepth = %5.2f'%depth
+
     # clear points, lines, and 2D lines
     for pt in ptList:
         pt['circle'].remove()
