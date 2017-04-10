@@ -162,32 +162,23 @@ playText1 = playButt1.text(.3, .3, '<' )
 playText2 = playButt2.text(.3, .3, '||')
 playText3 = playButt3.text(.3, .3, '>' )
 playText4 = playButt4.text(.3, .3, '>>')
-
-def on_press0(event):
-    global delDepth
+    
+def on_playButt(event):
+    global depth, delDepth
     if (event.inaxes is playButt0):
         print 'play <<'
-def on_press1(event):
-    global depth, delDepth
     if (event.inaxes is playButt1):
         print 'play <'
         depth -= delDepth
         depth = max(depth, -1)
         slider1.set_val(depth)
-def on_press2(event):
-    global delDepth
     if (event.inaxes is playButt2):
         print 'play ||'
-def on_press3(event):
-    global depth, delDepth
     if (event.inaxes is playButt3):
         print 'play >'
         depth += delDepth
         depth = min(depth, 1.)
         slider1.set_val(depth)
-def on_press4(event):
-    import time
-    global depth, delDepth
     if (event.inaxes is playButt4):
         print 'play >>'
         for d in np.arange(-1, 1, .05):
@@ -195,11 +186,13 @@ def on_press4(event):
             update(depth)
             plt.pause(.1)
     
-playButt0.figure.canvas.mpl_connect('button_press_event', on_press0)
-playButt1.figure.canvas.mpl_connect('button_press_event', on_press1)
-playButt2.figure.canvas.mpl_connect('button_press_event', on_press2)
-playButt3.figure.canvas.mpl_connect('button_press_event', on_press3)
-playButt4.figure.canvas.mpl_connect('button_press_event', on_press4)
+fig.canvas.mpl_connect('button_press_event', on_playButt)
+
+#playButt0.figure.canvas.mpl_connect('button_press_event', on_press0)
+#playButt1.figure.canvas.mpl_connect('button_press_event', on_press1)
+#playButt2.figure.canvas.mpl_connect('button_press_event', on_press2)
+#playButt3.figure.canvas.mpl_connect('button_press_event', on_press3)
+#playButt4.figure.canvas.mpl_connect('button_press_event', on_press4)
     
 # Back plane
 verts3D = np.array([[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[-1,-1,1]])
