@@ -33,6 +33,7 @@ plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
 plotData = np.zeros_like(plotTime)
 mute = False
 depth = 0
+delDepth = 0.1
 
 ptList = []
 lineList = []
@@ -46,7 +47,7 @@ xdata, ydata = 0., 0.
     
 # PyAudio Callback - gets called repeatedly
 def paCallback(in_data, frame_count, time_info, status):
-    global data
+    global data, depth
     return (data, pyaudio.paContinue)
 
 # PyAudio open audio stream
@@ -72,7 +73,7 @@ def updateWave():
     elif len(ptList) == 2:
         dist = np.sqrt((ptList[0]['xPos']  - ptList[1]['xPos'])**2. +
                        (ptList[0]['yPos']  - ptList[1]['yPos'])**2. +
-                       (ptList[0]['zPos'] - ptList[1]['zPos'])**2.)
+                       (ptList[0]['zPos']  - ptList[1]['zPos'])**2.)
         freqList.append(int(BASEFREQ/dist))
     else:
         for point1 in ptList:
@@ -80,7 +81,7 @@ def updateWave():
                 if point1 is not point2:
                     dist = np.sqrt((point1['xPos']  - point2['xPos'])**2. +
                                    (point1['yPos']  - point2['yPos'])**2. +
-                                   (point1['zPos'] - point2['zPos'])**2.)
+                                   (point1['zPos']  - point2['zPos'])**2.)
                     freqList.append(int(BASEFREQ/dist))
                                         
     fData = np.zeros(CHUNK, dtype=float)
@@ -143,12 +144,16 @@ depth = slider1.val
 xCoords = np.linspace(.55, .91, num=5)
 playButt0 = fig.add_axes([xCoords[0], .05, .04, .04])
 playButt0.axes.set_xticks([]), playButt0.axes.set_yticks([])
+
 playButt1 = fig.add_axes([xCoords[1], .05, .04, .04])
 playButt1.axes.set_xticks([]), playButt1.axes.set_yticks([])
+
 playButt2 = fig.add_axes([xCoords[2], .05, .04, .04])
 playButt2.axes.set_xticks([]), playButt2.axes.set_yticks([])
+
 playButt3 = fig.add_axes([xCoords[3], .05, .04, .04])
 playButt3.axes.set_xticks([]), playButt3.axes.set_yticks([])
+
 playButt4 = fig.add_axes([xCoords[4], .05, .04, .04])
 playButt4.axes.set_xticks([]), playButt4.axes.set_yticks([])
 
@@ -159,18 +164,29 @@ playText3 = playButt3.text(.3, .3, '>' )
 playText4 = playButt4.text(.3, .3, '>>')
 
 def on_press0(event):
+    global delDepth
     if (event.inaxes is playButt0):
         print 'play <<'
 def on_press1(event):
+    global depth, delDepth
     if (event.inaxes is playButt1):
         print 'play <'
+        depth -= delDepth
+        depth = max(depth, -1)
+        slider1.set_val(depth)
 def on_press2(event):
+    global delDepth
     if (event.inaxes is playButt2):
         print 'play ||'
 def on_press3(event):
+    global depth, delDepth
     if (event.inaxes is playButt3):
         print 'play >'
+        depth += delDepth
+        depth = min(depth, 1.)
+        slider1.set_val(depth)
 def on_press4(event):
+    global delDepth
     if (event.inaxes is playButt4):
         print 'play >>'
     
@@ -180,9 +196,6 @@ playButt2.figure.canvas.mpl_connect('button_press_event', on_press2)
 playButt3.figure.canvas.mpl_connect('button_press_event', on_press3)
 playButt4.figure.canvas.mpl_connect('button_press_event', on_press4)
     
-
-
-
 # Back plane
 verts3D = np.array([[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[-1,-1,1]])
 vertsXY = [verts3D[:,:2]]
@@ -240,7 +253,7 @@ def addLine2D(pt1, pt2, color='k'):
 def update(depth):   
     global rotList, ptList, lineList, line2DList
     print '\n===[ in update ]===='
-    print '\ndepth = %5.2f'%depth
+    print 'depth = %5.2f'%depth
     
     # clear points, lines, and 2D lines
     for pt in ptList:
@@ -319,14 +332,12 @@ def update(depth):
     plt.draw()    
 
 def updateSl1(val):
-    global depth    
+    global depth, delDepth    
     print '\n===[ in updateSl1 ]===='
     print '\ndepth = %5.2f'%depth
     depth = slider1.val
     update(depth)
 slider1.on_changed(updateSl1)
-
-
 
 
 # Frontal cube              
