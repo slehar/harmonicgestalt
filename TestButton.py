@@ -8,11 +8,9 @@ Created on Sat Apr  8 10:23:39 2017
 
 @author: slehar
 
-see http://matplotlib.org/users/event_handling.html
-
 """
 import matplotlib.pyplot as plt
-from matplotlib.widgets import Button
+#from matplotlib.widgets import Button
 
 # Open figure and set axes 1 for drawing Artists
 plt.close('all')
@@ -28,8 +26,9 @@ def press(event):
         plt.close()
 fig.canvas.mpl_connect('key_press_event', press)
 
+
 # Add button
-axButt = fig.add_axes([.2, .2, .2, .2])
+axButt = fig.add_axes([.4, .4, .2, .2])
 axButt.patch.set_fc('r')
 axButt.axes.set_xticks([])
 axButt.axes.set_yticks([])
@@ -48,32 +47,6 @@ def on_press(event):
     plt.pause(.001)
     plt.show()    
 axButt.figure.canvas.mpl_connect('button_press_event', on_press)
-
-
-# Using matplotlib.widgets.Button
-#butt1State = False
-#def on_clicked(event):
-#    global butt1State
-#    butt1State = not butt1State
-#    if butt1State:
-#        butt1.color = 'g'
-#        butt1.hovercolor = 'g'
-#        butt1.ax.set_axis_bgcolor(butt1.color)
-#        butt1.label = 'ON'
-#
-#    else:
-#        butt1.color = 'r'
-#        butt1.hovercolor = 'r'
-#        butt1.ax.set_axis_bgcolor(butt1.color)
-#        butt1.label = 'OFF'
-#    plt.pause(.001)
-#    plt.show()
-        
-
-#butt1 = Button(axButt, 'mpl-button', color='g', hovercolor='g')
-#butt1.on_clicked(on_clicked)
-
-
 
 
 # Show plot
