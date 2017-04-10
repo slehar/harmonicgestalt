@@ -186,9 +186,14 @@ def on_press3(event):
         depth = min(depth, 1.)
         slider1.set_val(depth)
 def on_press4(event):
-    global delDepth
+    import time
+    global depth, delDepth
     if (event.inaxes is playButt4):
         print 'play >>'
+        for d in np.arange(-1, 1, .05):
+            depth = d
+            update(depth)
+            plt.pause(.1)
     
 playButt0.figure.canvas.mpl_connect('button_press_event', on_press0)
 playButt1.figure.canvas.mpl_connect('button_press_event', on_press1)
@@ -252,8 +257,8 @@ def addLine2D(pt1, pt2, color='k'):
 
 def update(depth):   
     global rotList, ptList, lineList, line2DList
-    print '\n===[ in update ]===='
-    print 'depth = %5.2f'%depth
+#    print '\n===[ in update ]===='
+#    print 'depth = %5.2f'%depth
     
     # clear points, lines, and 2D lines
     for pt in ptList:
@@ -270,12 +275,12 @@ def update(depth):
             line2D[0].remove()
     line2DList = []
         
-    updateWave()
+#    updateWave()
     plt.show()
     plt.pause(.001)
         
-    print '====[rotList]==='
-    print rotList
+#    print '====[rotList]==='
+#    print rotList
     
     if len(rotList) > 0:
         scaList = np.array(rotList)
@@ -283,8 +288,8 @@ def update(depth):
     else: 
         scaList = np.array([])
     
-    print '====[scaList]==='
-    print scaList
+#    print '====[scaList]==='
+#    print scaList
 
     if len(scaList) > 0:        
         for pt in scaList:
