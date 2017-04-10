@@ -132,12 +132,33 @@ ax3d.set_ylim3d(-1, 1)
 ax3d.set_zlim3d(1, -1)
 
 #### Slider Axes ####
-axSl = fig.add_axes([.55, .05, .4, .05])
+axSl = fig.add_axes([.55, .1, .4, .05])
 axSl.axes.set_xticks([])
 axSl.axes.set_yticks([])
 
 slider1 = Slider(axSl, 'depth', -2., 2., valinit=0.)
 depth = slider1.val
+
+#### << < || > >>  play buttons ####
+xCoords = np.linspace(.55, .91, num=5)
+playButt0 = fig.add_axes([xCoords[0], .05, .04, .04])
+playButt0.axes.set_xticks([]), playButt0.axes.set_yticks([])
+playButt1 = fig.add_axes([xCoords[1], .05, .04, .04])
+playButt1.axes.set_xticks([]), playButt1.axes.set_yticks([])
+playButt2 = fig.add_axes([xCoords[2], .05, .04, .04])
+playButt2.axes.set_xticks([]), playButt2.axes.set_yticks([])
+playButt3 = fig.add_axes([xCoords[3], .05, .04, .04])
+playButt3.axes.set_xticks([]), playButt3.axes.set_yticks([])
+playButt4 = fig.add_axes([xCoords[4], .05, .04, .04])
+playButt4.axes.set_xticks([]), playButt4.axes.set_yticks([])
+
+playText0 = playButt0.text(.3, .3, '<<')
+playText1 = playButt1.text(.3, .3, '<' )
+playText2 = playButt2.text(.3, .3, '||')
+playText3 = playButt3.text(.3, .3, '>' )
+playText4 = playButt4.text(.3, .3, '>>')
+
+
 
 # Back plane
 verts3D = np.array([[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[-1,-1,1]])
