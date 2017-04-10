@@ -158,6 +158,29 @@ playText2 = playButt2.text(.3, .3, '||')
 playText3 = playButt3.text(.3, .3, '>' )
 playText4 = playButt4.text(.3, .3, '>>')
 
+def on_press0(event):
+    if (event.inaxes is playButt0):
+        print 'play <<'
+def on_press1(event):
+    if (event.inaxes is playButt1):
+        print 'play <'
+def on_press2(event):
+    if (event.inaxes is playButt2):
+        print 'play ||'
+def on_press3(event):
+    if (event.inaxes is playButt3):
+        print 'play >'
+def on_press4(event):
+    if (event.inaxes is playButt4):
+        print 'play >>'
+    
+playButt0.figure.canvas.mpl_connect('button_press_event', on_press0)
+playButt1.figure.canvas.mpl_connect('button_press_event', on_press1)
+playButt2.figure.canvas.mpl_connect('button_press_event', on_press2)
+playButt3.figure.canvas.mpl_connect('button_press_event', on_press3)
+playButt4.figure.canvas.mpl_connect('button_press_event', on_press4)
+    
+
 
 
 # Back plane
