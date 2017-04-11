@@ -172,14 +172,14 @@ def on_playButt(event):
             slider1.set_val(depth)
     if (event.inaxes is playButt1):
         depth -= delDepth
-        depth = max(depth, -1)
+        depth = max(depth, slider1.valmin)
         slider1.set_val(depth)
     if (event.inaxes is playButt2):
         depth = 0
         slider1.set_val(depth)
     if (event.inaxes is playButt3):
         depth += delDepth
-        depth = min(depth, 1.)
+        depth = min(depth, slider1.valmax)
         slider1.set_val(depth)
     if (event.inaxes is playButt4):
         for d in np.arange(-2, 2, .2):
