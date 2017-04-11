@@ -47,7 +47,7 @@ xdata, ydata = 0., 0.
     
 # PyAudio Callback - gets called repeatedly
 def paCallback(in_data, frame_count, time_info, status):
-    global data, depth
+    global data
     return (data, pyaudio.paContinue)
 
 # PyAudio open audio stream
@@ -166,33 +166,28 @@ playText4 = playButt4.text(.3, .3, '>>')
 def on_playButt(event):
     global depth, delDepth
     if (event.inaxes is playButt0):
-        print 'play <<'
+        for d in np.arange(2, -2, -.2):
+            depth = d
+            update(depth)
+            slider1.set_val(depth)
     if (event.inaxes is playButt1):
-        print 'play <'
         depth -= delDepth
         depth = max(depth, -1)
         slider1.set_val(depth)
     if (event.inaxes is playButt2):
-        print 'play ||'
+        depth = 0
+        slider1.set_val(depth)
     if (event.inaxes is playButt3):
-        print 'play >'
         depth += delDepth
         depth = min(depth, 1.)
         slider1.set_val(depth)
     if (event.inaxes is playButt4):
-        print 'play >>'
-        for d in np.arange(-1, 1, .05):
+        for d in np.arange(-2, 2, .2):
             depth = d
             update(depth)
-            plt.pause(.1)
+            slider1.set_val(depth)
     
 fig.canvas.mpl_connect('button_press_event', on_playButt)
-
-#playButt0.figure.canvas.mpl_connect('button_press_event', on_press0)
-#playButt1.figure.canvas.mpl_connect('button_press_event', on_press1)
-#playButt2.figure.canvas.mpl_connect('button_press_event', on_press2)
-#playButt3.figure.canvas.mpl_connect('button_press_event', on_press3)
-#playButt4.figure.canvas.mpl_connect('button_press_event', on_press4)
     
 # Back plane
 verts3D = np.array([[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1],[-1,-1,1]])
@@ -269,8 +264,8 @@ def update(depth):
     line2DList = []
         
 #    updateWave()
-    plt.show()
-    plt.pause(.001)
+#    plt.show()
+#    plt.pause(.001)
         
 #    print '====[rotList]==='
 #    print rotList
@@ -331,8 +326,6 @@ def update(depth):
 
 def updateSl1(val):
     global depth, delDepth    
-    print '\n===[ in updateSl1 ]===='
-    print '\ndepth = %5.2f'%depth
     depth = slider1.val
     update(depth)
 slider1.on_changed(updateSl1)
