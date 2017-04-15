@@ -100,8 +100,8 @@ def updateWave():
 
 
 ####### Open figure and set axes 1 for drawing Artists ########
-#figYSize, figXSize = (15,8)
-figYSize, figXSize = (12,6)
+figYSize, figXSize = (15,8)
+#figYSize, figXSize = (12,6)
 winAspect = float(figYSize)/float(figXSize)
 plt.close('all')
 fig = plt.figure(figsize=(figYSize,figXSize))
@@ -132,11 +132,10 @@ ax3d.set_xlim3d(-1, 1)
 ax3d.set_ylim3d(-1, 1)
 ax3d.set_zlim3d(1, -1)
 
-#### Slider Axes ####
+#### Depth Slider  ####
 axSl = fig.add_axes([.55, .1, .4, .05])
 axSl.axes.set_xticks([])
 axSl.axes.set_yticks([])
-
 slider1 = Slider(axSl, 'depth', -2., 2., valinit=0.)
 depth = slider1.val
 
@@ -165,6 +164,7 @@ playText4 = playButt4.text(.3, .3, '>>')
     
 def on_playButt(event):
     global depth, delDepth
+    
     if (event.inaxes is playButt0):
         for d in np.arange(2, -2, -.2):
             depth = d
@@ -245,8 +245,6 @@ def addLine2D(pt1, pt2, color='k'):
 
 def update(depth):   
     global rotList, ptList, lineList, line2DList
-#    print '\n===[ in update ]===='
-#    print 'depth = %5.2f'%depth
     
     # clear points, lines, and 2D lines
     for pt in ptList:
@@ -262,23 +260,13 @@ def update(depth):
         if line2D[0]:
             line2D[0].remove()
     line2DList = []
-        
-#    updateWave()
-#    plt.show()
-#    plt.pause(.001)
-        
-#    print '====[rotList]==='
-#    print rotList
-    
+            
     if len(rotList) > 0:
         scaList = np.array(rotList)
         scaList[:,2] *= depth
     else: 
         scaList = np.array([])
     
-#    print '====[scaList]==='
-#    print scaList
-
     if len(scaList) > 0:        
         for pt in scaList:
             addPoint(pt)
@@ -369,13 +357,9 @@ def rotateZ(cube, aZ):
 def setPattern(label):
     global ptList, lineList, rotList, line2DList
     
-    print '\n===[ in setPattern ]===='
-    print '\ndepth = %5.2f'%depth
-
     if label == 'Clear':
         rotList = []
         ptList = []
-
     elif label == 'Nek0':
         rotList = frontal
     elif label == 'Nek1':
@@ -389,10 +373,8 @@ def setPattern(label):
         rotList = rotateX(rotList,   30)
     elif label == 'Nek4':
         rotList = rotateY(frontal,  -45)
-        rotList = rotateX(rotList,   35.2)
-        
-    update(depth)
-    
+        rotList = rotateX(rotList,   35.2)        
+    update(depth)    
 radio.on_clicked(setPattern)
 
 
