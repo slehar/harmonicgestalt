@@ -107,7 +107,7 @@ plt.close('all')
 fig = plt.figure(figsize=(figYSize,figXSize))
 fig.canvas.set_window_title('Harmonic Gestalt 3D Slide')
 fig.text(.008/winAspect, .9, 'click new point\ndrag move point')
-fig.text(.008/winAspect, .7, 'd : delete pt\n\nm : mute\n\nq : quit')
+fig.text(.008/winAspect, .7, 'del : delete pt\n\nm : mute\n\nq : quit')
 
 #### Stimulus axes ####
 axStim = fig.add_axes([.1, .4/winAspect, .7/winAspect, .75])
@@ -166,7 +166,7 @@ def on_playButt(event):
     global depth, delDepth
     
     if (event.inaxes is playButt0):
-        for d in np.arange(2, -2, -.2):
+        for d in np.arange(2, -2, -.1):
             depth = d
             update(depth)
             slider1.set_val(depth)
@@ -182,11 +182,10 @@ def on_playButt(event):
         depth = min(depth, slider1.valmax)
         slider1.set_val(depth)
     if (event.inaxes is playButt4):
-        for d in np.arange(-2, 2, .2):
+        for d in np.arange(-2, 2, .1):
             depth = d
             update(depth)
-            slider1.set_val(depth)
-    
+            slider1.set_val(depth)    
 fig.canvas.mpl_connect('button_press_event', on_playButt)
     
 # Back plane
@@ -359,6 +358,13 @@ def setPattern(label):
     
     if label == 'Clear':
         rotList = []
+        for pt in ptList:
+            if pt['circle']:
+                pt['circle'].remove()
+            if pt['rod']:
+                pt['rod'][0].remove()
+            if pt['bead']:
+                pt['bead'].remove()
         ptList = []
     elif label == 'Nek0':
         rotList = frontal
@@ -387,7 +393,7 @@ line, = axSpect.semilogy(plotFreq, plotData)
 axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 
 # Keypress 'q' to quit
-def press(event):
+def keypress(event):
     global ptList, data, mute
     if event.key == 'q':
         stream.stop_stream()
@@ -500,7 +506,7 @@ plt.sca(axStim)
 fig.canvas.mpl_connect('button_press_event',    on_press)
 fig.canvas.mpl_connect('button_release_event',  on_release)
 fig.canvas.mpl_connect('motion_notify_event',   on_motion)
-fig.canvas.mpl_connect('key_press_event',       press)
+fig.canvas.mpl_connect('key_press_event',       keypress)
 
 
 # Show plot
