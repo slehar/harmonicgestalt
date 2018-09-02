@@ -203,8 +203,16 @@ def updateSl2(val):
 slider2.on_changed(updateSl2)
 
 
+# Transformation matrix & its inverse
+transMat = np.array([[scale, 0,     0],
+                     [0,     scale, 0],
+                     [0,     0,     1]])
+
+invMat = np.linalg.inv(transMat)
+
 # Keypress 'q' to quit
-def press(event):
+def keypress(event):
+    global transmat
     global ptList, data, mute
     if event.key == 'q':
         stream.stop_stream()
@@ -224,13 +232,49 @@ def press(event):
             lastPt['circle'].remove()
             fig.canvas.draw()
             updateWave()
-
-# Transformation matrix & its inverse
-transMat = np.array([[scale, 0,     0],
-                     [0,     scale, 0],
-                     [0,     0,     1]])
-
-invMat = np.linalg.inv(transMat)
+    elif event.key == 'right':
+            ptList[-1]['absPos'][0] += 0.01            
+            ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], transMat)
+            ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
+            ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
+            ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
+            updateWave()
+    elif event.key == 'left':
+            print('left')
+            print('ptList[last] = %r' % ptList[-1])
+            ptList[-1]['absPos'][0] -= 0.01            
+            ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], transMat)
+            ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
+            ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
+            ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
+            updateWave()
+    elif event.key == 'up':
+            ptList[-1]['absPos'][1] += 0.01            
+            ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], transMat)
+            ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
+            ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
+            ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
+            updateWave()
+    elif event.key == 'down':
+            ptList[-1]['absPos'][1] -= 0.01            
+            ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], transMat)
+            ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
+            ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
+            ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
+            updateWave()
+    
+'''
+        xdata = event.xdata
+        ydata = event.ydata
+        absPos = [xdata, ydata, 1.]
+        transPos = np.matmul(absPos, transMat)
+#        circ = mpatches.Circle((xdata, ydata), ptRad)
+#        circ = mpatches.Circle(transPos, ptRad)
+        selectedPt['circle'].center = transPos[:2]
+        selectedPt['xPos'] = transPos[0]
+        selectedPt['yPos'] = transPos[1]
+        fig.canvas.draw()
+'''
 
 ########################
 def on_press(event):
@@ -318,7 +362,7 @@ def on_motion(event):
 fig.canvas.mpl_connect('button_press_event',    on_press)
 fig.canvas.mpl_connect('button_release_event',  on_release)
 fig.canvas.mpl_connect('motion_notify_event',   on_motion)
-fig.canvas.mpl_connect('key_press_event',       press)
+fig.canvas.mpl_connect('key_press_event',       keypress)
 
 
 # Initial update of wave
