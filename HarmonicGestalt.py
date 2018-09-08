@@ -33,6 +33,8 @@ mute = False
 freqList = []
 
 buttonState = False
+shiftState = False
+
 xdata, ydata = -.5, 0.
 ptList = []
 #ptList.append({'xPos':xdata, 
@@ -65,7 +67,10 @@ plt.close('all')
 fig = plt.figure(figsize=(figYSize,figXSize))
 fig.canvas.set_window_title('Harmonic Gestalt')
 fig.text(1.02/winAspect, .5, 'click new point\ndrag move point')
-fig.text(1.03/winAspect, .3, 'd : delete pt\n\nm : mute\n\nq : quit')
+fig.text(1.02/winAspect, .4, 'arrow keys move\nlatest point')
+fig.text(1.02/winAspect, .3, '[shift] arrow keys for\n fast movement')
+fig.text(1.04/winAspect, .1, 'd : delete pt\n\nm : mute\n\nq : quit')
+
 nPeaks = 0
 peaksTxt = fig.text(.9/winAspect, .13, 'Peaks %3d'%nPeaks)
 
@@ -211,9 +216,19 @@ transMat = np.array([[scale, 0,     0],
 invMat = np.linalg.inv(transMat)
 
 # Keypress 'q' to quit
-def keypress(event):
+def on_keypress(event):
     global transmat
-    global ptList, data, mute
+    global ptList, data, mute, shiftState
+    
+    print('event.key = %s'%event.key)
+    
+    if shiftState:
+        delta = 0.1
+        print('delta = %5.4f'%delta)
+    else:
+        delta = 0.01
+        print('delta = %5.4f'%delta)
+        
     if event.key == 'q':
         stream.stop_stream()
         stream.close()
@@ -232,49 +247,50 @@ def keypress(event):
             lastPt['circle'].remove()
             fig.canvas.draw()
             updateWave()
-    elif event.key == 'right':
-            ptList[-1]['absPos'][0] += 0.01            
+    elif event.key in ('right', 'shift+right'):
+            ptList[-1]['absPos'][0] += delta            
             ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], transMat)
             ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
             ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
             ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
             updateWave()
-    elif event.key == 'left':
-            print('left')
-            print('ptList[last] = %r' % ptList[-1])
-            ptList[-1]['absPos'][0] -= 0.01            
+    elif event.key in ('left', 'shift+left'):
+            ptList[-1]['absPos'][0] -= delta            
             ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], transMat)
             ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
             ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
             ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
             updateWave()
-    elif event.key == 'up':
-            ptList[-1]['absPos'][1] += 0.01            
+    elif event.key in ('up', 'shift+up'):
+            ptList[-1]['absPos'][1] += delta            
             ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], transMat)
             ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
             ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
             ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
             updateWave()
-    elif event.key == 'down':
-            ptList[-1]['absPos'][1] -= 0.01            
+    elif event.key in ('down', 'shift+down'):
+            ptList[-1]['absPos'][1] -= delta            
             ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], transMat)
             ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
             ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
             ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
             updateWave()
+    elif event.key == 'shift':
+        print('SHIFT KEY PRESS')
+        shiftState = True
+        print('shiftState = %s'%shiftState)
     
-'''
-        xdata = event.xdata
-        ydata = event.ydata
-        absPos = [xdata, ydata, 1.]
-        transPos = np.matmul(absPos, transMat)
-#        circ = mpatches.Circle((xdata, ydata), ptRad)
-#        circ = mpatches.Circle(transPos, ptRad)
-        selectedPt['circle'].center = transPos[:2]
-        selectedPt['xPos'] = transPos[0]
-        selectedPt['yPos'] = transPos[1]
-        fig.canvas.draw()
-'''
+
+########################
+def on_keyrelease(event):
+    global shiftState
+    
+    print('In on_keyrelease, event.key = %s' % event.key)
+    if event.key == 'shift':
+        print('SHIFT KEY RELEASE')
+        shiftState = False
+        print('shiftState = %s'%shiftState)
+
 
 ########################
 def on_press(event):
@@ -362,7 +378,8 @@ def on_motion(event):
 fig.canvas.mpl_connect('button_press_event',    on_press)
 fig.canvas.mpl_connect('button_release_event',  on_release)
 fig.canvas.mpl_connect('motion_notify_event',   on_motion)
-fig.canvas.mpl_connect('key_press_event',       keypress)
+fig.canvas.mpl_connect('key_press_event',       on_keypress)
+fig.canvas.mpl_connect('key_release_event',     on_keyrelease)
 
 
 # Initial update of wave
