@@ -143,7 +143,8 @@ def updateWave():
     fData = np.zeros(CHUNK, dtype=float)
     for freq in freqList:
         iFreq = float(int(freq/10.))
-        fData += np.sin(time*iFreq)
+        ampl  = 1./freq
+        fData += ampl * np.sin(time*iFreq)
     fData = fData / np.max(np.abs(fData)) * 127 + 128
     yData = np.abs(np.fft.fft(fData[:PLOTWIDTH]))
     yData /= 100.
@@ -215,12 +216,11 @@ transMat = np.array([[scale, 0,     0],
 
 invMat = np.linalg.inv(transMat)
 
-# Keypress 'q' to quit
+# On Keypress Event 
 def on_keypress(event):
     global transmat
     global ptList, data, mute, shiftState
     
-    print('event.key = %s'%event.key)
     
     if shiftState:
         delta = 0.1
@@ -285,7 +285,6 @@ def on_keypress(event):
 def on_keyrelease(event):
     global shiftState
     
-    print('In on_keyrelease, event.key = %s' % event.key)
     if event.key == 'shift':
         print('SHIFT KEY RELEASE')
         shiftState = False
