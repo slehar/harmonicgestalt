@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-HarmonicGestalt.py
+HarmonicGestalt3D.py
 
 Created on Wed Jun  1 09:45:43 2016
 
@@ -81,7 +81,8 @@ def updateWave():
     fData = np.zeros(CHUNK, dtype=float)
     for freq in freqList:
         iFreq = float(int(freq/10.))
-        fData += np.sin(time*iFreq)
+        ampl = 1./freq
+        fData += ampl * np.sin(time*iFreq)
     fData = fData / np.max(np.abs(fData)) * 127 + 128
     yData = np.abs(np.fft.fft(fData[:PLOTWIDTH]))
     yData /= 100.
@@ -188,8 +189,10 @@ plotFreq = plotTime - np.pi
 line, = axSpect.semilogy(plotFreq, plotData)
 axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 
+
+
 # Keypress 'q' to quit
-def press(event):
+def keypress(event):
     global ptList, data, mute
     if event.key == 'q':
         stream.stop_stream()
@@ -210,7 +213,51 @@ def press(event):
             lastPt['rod'].pop(0).remove()
             lastPt['bead'].remove()
             fig.canvas.draw()
+    updateWave()
+            
+    '''           
+    elif event.key == 'right':
+            print('right')
+            print('\n%r'%ptList[-1])
+            ptList[-1]['xPos'] += 0.01            
+            (xPos, yPos) = (ptList[-1]['xPos'], ptList[-1]['yPos'])
+            ptList[-1]['circle'].center = (xPos, yPos)
+            print('Center:  %r' % ptList[-1]['circle'].center )
+
+            ptList[-1]['rod'][0].set_xdata([xPos, xPos])
+            ptList[-1]['rod'][0].set_ydata([-yPos, -yPos])
+            ptList[-1]['rod'][0].set_3d_properties([-1, 1], zdir='y')
+            ptList[-1]['bead'].set_offsets([yPos, -yPos])
+            ptList[-1]['bead'].set_3d_properties(ptList[0]['depth'], zdir='y')
+            plt.pause(.001)
+
             updateWave()
+    elif event.key == 'left':
+            print('left')
+            print('ptList[last] = %r' % ptList[-1])
+            ptList[-1]['absPos'][0] -= 0.01            
+            ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], np.itentity(3))
+            ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
+            ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
+            ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
+            updateWave()
+    elif event.key == 'up':
+            ptList[-1]['absPos'][1] += 0.01            
+            ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], np.itentity(3))
+            ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
+            ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
+            ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
+            updateWave()
+    elif event.key == 'down':
+            ptList[-1]['absPos'][1] -= 0.01            
+            ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], np.itentity(3))
+            ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
+            ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
+            ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
+            updateWave()
+'''
+
+    fig.canvas.draw()
 
 ########################
 def on_press(event):
@@ -310,7 +357,7 @@ plt.sca(axStim)
 fig.canvas.mpl_connect('button_press_event',    on_press)
 fig.canvas.mpl_connect('button_release_event',  on_release)
 fig.canvas.mpl_connect('motion_notify_event',   on_motion)
-fig.canvas.mpl_connect('key_press_event',       press)
+fig.canvas.mpl_connect('key_press_event',       keypress)
 
 
 # Show plot
