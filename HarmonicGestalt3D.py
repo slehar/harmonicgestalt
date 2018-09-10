@@ -31,11 +31,18 @@ fData = np.sin(time)
 plotTime = np.arange(0, twoPi, twoPi/PLOTWIDTH)
 plotData = np.zeros_like(plotTime)
 mute = False
+shiftState = False
+delta = 0.1
+yOff = 0.
+deltaY = -.03
 
 ptList = []
 selectedPt = None
 freqList = []
+
 buttonState = False
+shiftState = False
+
 xdata, ydata = 0., 0.
 
     
@@ -147,12 +154,16 @@ poly2.set_edgecolor('k')
 ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 
 # Create zeroth point
+'''
 label = 'Pt %1d'%len(ptList)
-xPos, yPos = -.5, -.2
+(xPos, yPos, zPos) = (-.5, -.2, 0.)
+print('xyz = %5.2f %5.2f %5.2f'%(xPos,yPos,zPos))
 circle = mpatches.Circle((xPos, yPos), ptRad)
 axStim.add_patch(circle)
 rod  = ax3d.plot([xPos, xPos], [-yPos, -yPos], [-1, 1], color='gray', zdir='y')
-bead = ax3d.scatter([xPos], [-yPos], [0.], zdir='y', color='blue')
+bead = ax3d.scatter([xPos], [-yPos], [zPos], zdir='y', color='blue')
+bead.set_3d_properties(zPos, zdir='y')
+
 yOff = 0.; deltaY = -.03
 sliderAx = fig.add_axes([.6, .15+yOff, .6/winAspect, .02])
 yOff += deltaY
@@ -160,16 +171,18 @@ sliderAx.set_xticks([]); sliderAx.set_yticks([])
 slider = Slider(sliderAx, label, -1., 1., valinit=0.)
 depth = slider.val
 
+
 ptList.append({'label':label, 
                'xPos':xPos, 
-               'yPos':yPos, 
+               'yPos':-yPos, 
                'selected':False,
                'circle':circle, 
                'rod':rod, 
                'bead':bead, 
-               'depth':depth,
+               'depth':zPos,
                'sliderAx':sliderAx, 
                'slider':slider,})
+'''
                                              
 def updateSliders(val):
     for pt in ptList:
@@ -178,7 +191,7 @@ def updateSliders(val):
         pt['bead'].set_offsets([pt['xPos'], -pt['yPos']])
         pt['bead'].set_3d_properties(depth, zdir='y')
         updateWave()
-slider.on_changed(updateSliders)
+#slider.on_changed(updateSliders)
                
 
 #### Axes for spectrum ####
@@ -191,9 +204,16 @@ axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 
 
 
-# Keypress 'q' to quit
-def keypress(event):
-    global ptList, data, mute
+# On Keypress Event
+def on_keypress(event):
+    global ptList, data, mute, shiftState, delta, yOff, deltaY
+    
+    if event.key == 'shift':
+       shiftState = True
+    if shiftState:
+        delta = 0.1
+    else:
+        delta = 0.05        
     if event.key == 'q':
         stream.stop_stream()
         stream.close()
@@ -206,62 +226,86 @@ def keypress(event):
         else:
             mute = True
             stream.stop_stream()
+    elif len(ptList) <= 0:
+        return
     elif event.key == 'backspace':
-        if len(ptList) > 0:
-            lastPt = ptList.pop()
-            lastPt['circle'].remove()
-            lastPt['rod'].pop(0).remove()
-            lastPt['bead'].remove()
-            fig.canvas.draw()
-    updateWave()
+        lastPt = ptList.pop()
+        lastPt['circle'].remove()
+        lastPt['rod'].pop(0).remove()
+        lastPt['bead'].remove()
+        fig.canvas.draw()
+        updateWave()
             
-    '''           
-    elif event.key == 'right':
-            print('right')
-            print('\n%r'%ptList[-1])
-            ptList[-1]['xPos'] += 0.01            
-            (xPos, yPos) = (ptList[-1]['xPos'], ptList[-1]['yPos'])
-            ptList[-1]['circle'].center = (xPos, yPos)
-            print('Center:  %r' % ptList[-1]['circle'].center )
-
-            ptList[-1]['rod'][0].set_xdata([xPos, xPos])
-            ptList[-1]['rod'][0].set_ydata([-yPos, -yPos])
-            ptList[-1]['rod'][0].set_3d_properties([-1, 1], zdir='y')
-            ptList[-1]['bead'].set_offsets([yPos, -yPos])
-            ptList[-1]['bead'].set_3d_properties(ptList[0]['depth'], zdir='y')
-            plt.pause(.001)
-
-            updateWave()
-    elif event.key == 'left':
-            print('left')
-            print('ptList[last] = %r' % ptList[-1])
-            ptList[-1]['absPos'][0] -= 0.01            
-            ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], np.itentity(3))
-            ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
-            ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
-            ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
-            updateWave()
-    elif event.key == 'up':
-            ptList[-1]['absPos'][1] += 0.01            
-            ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], np.itentity(3))
-            ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
-            ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
-            ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
-            updateWave()
-    elif event.key == 'down':
-            ptList[-1]['absPos'][1] -= 0.01            
-            ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], np.itentity(3))
-            ptList[-1]['xPos'] = ptList[-1]['transPos'][0]
-            ptList[-1]['yPos'] = ptList[-1]['transPos'][1]
-            ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
-            updateWave()
-'''
-
+    elif event.key in ('right', 'shift+right'):
+        ptList[-1]['xPos'] += delta
+        (xPos, yPos, zPos) = (ptList[-1]['xPos'],
+                              -ptList[-1]['yPos'],
+                              ptList[-1]['depth'])
+        ptList[-1]['circle'].center = (xPos, yPos)
+        ptList[-1]['rod'][0].set_xdata([xPos, xPos])
+        ptList[-1]['rod'][0].set_ydata([-yPos, -yPos])
+        ptList[-1]['rod'][0].set_3d_properties([-1, 1], zdir='y')
+        ptList[-1]['bead'].set_offsets([xPos, -yPos])
+        ptList[-1]['bead'].set_3d_properties(zPos, zdir='y')
+        plt.pause(.001)
+        updateWave()
+        
+    elif event.key in ('left', 'shift+left'):
+        ptList[-1]['xPos'] -= delta
+        (xPos, yPos, zPos) = ( ptList[-1]['xPos'],
+                              -ptList[-1]['yPos'],
+                               ptList[-1]['depth'])
+        ptList[-1]['circle'].center = (xPos, yPos)
+        ptList[-1]['rod'][0].set_xdata([xPos, xPos])
+        ptList[-1]['rod'][0].set_ydata([-yPos, -yPos])
+        ptList[-1]['rod'][0].set_3d_properties([-1, 1], zdir='y')
+        ptList[-1]['bead'].set_offsets([xPos, -yPos])
+        ptList[-1]['bead'].set_3d_properties(zPos, zdir='y')
+        plt.pause(.001)
+        updateWave()
+    elif event.key in ('up', 'shift+up'):
+        ptList[-1]['yPos'] -= delta
+        (xPos, yPos, zPos) = ( ptList[-1]['xPos'],
+                              -ptList[-1]['yPos'],
+                               ptList[-1]['depth'])
+        ptList[-1]['circle'].center = (xPos, yPos)
+        ptList[-1]['rod'][0].set_xdata([xPos, xPos])
+        ptList[-1]['rod'][0].set_ydata([-yPos, -yPos])
+        ptList[-1]['rod'][0].set_3d_properties([-1, 1], zdir='y')
+        ptList[-1]['bead'].set_offsets([xPos, -yPos])
+        ptList[-1]['bead'].set_3d_properties(zPos, zdir='y')
+        plt.pause(.001)
+        updateWave()
+    elif event.key in ('down', 'shift+down'):
+        ptList[-1]['yPos'] += delta
+        (xPos, yPos, zPos) = ( ptList[-1]['xPos'],
+                              -ptList[-1]['yPos'],
+                               ptList[-1]['depth'])
+        ptList[-1]['circle'].center = (xPos, yPos)
+        ptList[-1]['rod'][0].set_xdata([xPos, xPos])
+        ptList[-1]['rod'][0].set_ydata([-yPos, -yPos])
+        ptList[-1]['rod'][0].set_3d_properties([-1, 1], zdir='y')
+        ptList[-1]['bead'].set_offsets([xPos, -yPos])
+        ptList[-1]['bead'].set_3d_properties(zPos, zdir='y')
+        plt.pause(.001)
+        updateWave()
+         
     fig.canvas.draw()
+
+    
+########################
+def on_keyrelease(event):
+    global shiftState
+    
+    if event.key == 'shift':
+        print('SHIFT KEY RELEASE')
+        shiftState = False
+        print('shiftState = %s'%shiftState)
+
 
 ########################
 def on_press(event):
-    global buttonState, selectedPt, yOff
+    global buttonState, selectedPt, yOff, deltaY
     if event.inaxes is not axStim:
         return
     inAPoint = False
@@ -294,13 +338,14 @@ def on_press(event):
         sliderAx = fig.add_axes([.6, .15+yOff, .6/winAspect, .02])
         yOff += deltaY
         sliderAx.set_xticks([]); sliderAx.set_yticks([])
-        slider = Slider(sliderAx, label, -1., 1., valinit=0.)
-        depth = slider.val
+        depth = 0.
+        slider = Slider(sliderAx, label, -1., 1., valinit=depth)
+        bead.set_3d_properties(depth, zdir='y')
         slider.on_changed(updateSliders)
 
         ptList.append({'label':label,
                        'xPos':xdata, 
-                       'yPos':ydata, 
+                       'yPos':-ydata, 
                        'selected':False,
                        'circle':circle, 
                        'rod':rod, 
@@ -357,7 +402,8 @@ plt.sca(axStim)
 fig.canvas.mpl_connect('button_press_event',    on_press)
 fig.canvas.mpl_connect('button_release_event',  on_release)
 fig.canvas.mpl_connect('motion_notify_event',   on_motion)
-fig.canvas.mpl_connect('key_press_event',       keypress)
+fig.canvas.mpl_connect('key_press_event',       on_keypress)
+fig.canvas.mpl_connect('key_release_event',     on_keyrelease)
 
 
 # Show plot
