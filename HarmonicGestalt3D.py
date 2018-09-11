@@ -108,7 +108,7 @@ plt.close('all')
 fig = plt.figure(figsize=(figYSize,figXSize))
 fig.canvas.set_window_title('Harmonic Gestalt')
 fig.text(.008/winAspect, .9, 'click new point\ndrag move point')
-fig.text(.008/winAspect, .7, 'd : delete pt\n\nm : mute\n\nq : quit')
+fig.text(.008/winAspect, .7, 'd : delete pt\n\nm : mute\n\n arrow keys move\n+/- keys depth \n\nq : quit')
 
 #### Stimulus axes ####
 axStim = fig.add_axes([.1, .4/winAspect, .7/winAspect, .75])
@@ -184,9 +184,9 @@ def on_keypress(event):
     if event.key == 'shift':
        shiftState = True
     if shiftState:
-        delta = 0.1
+        delta = 0.2
     else:
-        delta = 0.05        
+        delta = 0.01        
     if event.key == 'q':
         stream.stop_stream()
         stream.close()

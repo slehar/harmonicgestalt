@@ -223,11 +223,9 @@ def on_keypress(event):
     
     
     if shiftState:
-        delta = 0.1
-        print('delta = %5.4f'%delta)
+        delta = 0.2
     else:
         delta = 0.01
-        print('delta = %5.4f'%delta)
         
     if event.key == 'q':
         stream.stop_stream()
@@ -276,9 +274,7 @@ def on_keypress(event):
             ptList[-1]['circle'].center = ptList[-1]['transPos'][:2]
             updateWave()
     elif event.key == 'shift':
-        print('SHIFT KEY PRESS')
         shiftState = True
-        print('shiftState = %s'%shiftState)
     
 
 ########################
@@ -286,9 +282,7 @@ def on_keyrelease(event):
     global shiftState
     
     if event.key == 'shift':
-        print('SHIFT KEY RELEASE')
         shiftState = False
-        print('shiftState = %s'%shiftState)
 
 
 ########################
