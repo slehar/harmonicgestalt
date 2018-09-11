@@ -212,7 +212,7 @@ def on_keypress(event):
     elif event.key in ('right', 'shift+right'):
         ptList[-1]['xPos'] += delta
         (xPos, yPos, zPos) = (ptList[-1]['xPos'],
-                              -ptList[-1]['yPos'],
+                              ptList[-1]['yPos'],
                               ptList[-1]['depth'])
         ptList[-1]['circle'].center = (xPos, yPos)
         ptList[-1]['rod'][0].set_xdata([xPos, xPos])
@@ -220,54 +220,62 @@ def on_keypress(event):
         ptList[-1]['rod'][0].set_3d_properties([-1, 1], zdir='y')
         ptList[-1]['bead'].set_offsets([xPos, -yPos])
         ptList[-1]['bead'].set_3d_properties(zPos, zdir='y')
+        ptList[-1]['proj'].set_offsets([xPos, -yPos])
+        ptList[-1]['proj'].set_3d_properties(-1.05, zdir='y')
         plt.pause(.001)
         updateWave()
         
     elif event.key in ('left', 'shift+left'):
         ptList[-1]['xPos'] -= delta
-        (xPos, yPos, zPos) = ( ptList[-1]['xPos'],
-                              -ptList[-1]['yPos'],
-                               ptList[-1]['depth'])
+        (xPos, yPos, zPos) = (ptList[-1]['xPos'],
+                              ptList[-1]['yPos'],
+                              ptList[-1]['depth'])
         ptList[-1]['circle'].center = (xPos, yPos)
         ptList[-1]['rod'][0].set_xdata([xPos, xPos])
         ptList[-1]['rod'][0].set_ydata([-yPos, -yPos])
         ptList[-1]['rod'][0].set_3d_properties([-1, 1], zdir='y')
         ptList[-1]['bead'].set_offsets([xPos, -yPos])
         ptList[-1]['bead'].set_3d_properties(zPos, zdir='y')
+        ptList[-1]['proj'].set_offsets([xPos, -yPos])
+        ptList[-1]['proj'].set_3d_properties(-1.05, zdir='y')
         plt.pause(.001)
         updateWave()
     elif event.key in ('up', 'shift+up'):
-        ptList[-1]['yPos'] -= delta
-        (xPos, yPos, zPos) = ( ptList[-1]['xPos'],
-                              -ptList[-1]['yPos'],
-                               ptList[-1]['depth'])
+        ptList[-1]['yPos'] += delta
+        (xPos, yPos, zPos) = (ptList[-1]['xPos'],
+                              ptList[-1]['yPos'],
+                              ptList[-1]['depth'])
         ptList[-1]['circle'].center = (xPos, yPos)
         ptList[-1]['rod'][0].set_xdata([xPos, xPos])
         ptList[-1]['rod'][0].set_ydata([-yPos, -yPos])
         ptList[-1]['rod'][0].set_3d_properties([-1, 1], zdir='y')
         ptList[-1]['bead'].set_offsets([xPos, -yPos])
         ptList[-1]['bead'].set_3d_properties(zPos, zdir='y')
+        ptList[-1]['proj'].set_offsets([xPos, -yPos])
+        ptList[-1]['proj'].set_3d_properties(-1.05, zdir='y')
         plt.pause(.001)
         updateWave()
     elif event.key in ('down', 'shift+down'):
-        ptList[-1]['yPos'] += delta
-        (xPos, yPos, zPos) = ( ptList[-1]['xPos'],
-                              -ptList[-1]['yPos'],
-                               ptList[-1]['depth'])
+        ptList[-1]['yPos'] -= delta
+        (xPos, yPos, zPos) = (ptList[-1]['xPos'],
+                              ptList[-1]['yPos'],
+                              ptList[-1]['depth'])
         ptList[-1]['circle'].center = (xPos, yPos)
         ptList[-1]['rod'][0].set_xdata([xPos, xPos])
         ptList[-1]['rod'][0].set_ydata([-yPos, -yPos])
         ptList[-1]['rod'][0].set_3d_properties([-1, 1], zdir='y')
         ptList[-1]['bead'].set_offsets([xPos, -yPos])
         ptList[-1]['bead'].set_3d_properties(zPos, zdir='y')
+        ptList[-1]['proj'].set_offsets([xPos, -yPos])
+        ptList[-1]['proj'].set_3d_properties(-1.05, zdir='y')
         plt.pause(.001)
         updateWave()
          
     elif event.key in ('+', '='):
         ptList[-1]['depth'] += delta
-        (xPos, yPos, zPos) = ( ptList[-1]['xPos'],
-                              -ptList[-1]['yPos'],
-                               ptList[-1]['depth'])
+        (xPos, yPos, zPos) = (ptList[-1]['xPos'],
+                              ptList[-1]['yPos'],
+                              ptList[-1]['depth'])
         ptList[-1]['slider'].set_val(zPos)
         ptList[-1]['bead'].set_offsets([xPos, -yPos])
         ptList[-1]['bead'].set_3d_properties(zPos, zdir='y')
@@ -276,9 +284,9 @@ def on_keypress(event):
          
     elif event.key in ('_', '-'):
         ptList[-1]['depth'] -= delta
-        (xPos, yPos, zPos) = ( ptList[-1]['xPos'],
-                              -ptList[-1]['yPos'],
-                               ptList[-1]['depth'])
+        (xPos, yPos, zPos) = (ptList[-1]['xPos'],
+                              ptList[-1]['yPos'],
+                              ptList[-1]['depth'])
         ptList[-1]['slider'].set_val(zPos)
         ptList[-1]['bead'].set_offsets([xPos, -yPos])
         ptList[-1]['bead'].set_3d_properties(zPos, zdir='y')
@@ -323,6 +331,7 @@ def on_press(event):
         label = 'Pt %1d'%len(ptList)
         xdata = event.xdata
         ydata = event.ydata
+        print('ydata=%7.4f'%ydata)
         plt.sca(axStim)
         
         circle = mpatches.Circle((xdata, ydata), ptRad) # 2D point in axStim
@@ -332,14 +341,14 @@ def on_press(event):
 
         rod  = ax3d.plot([xdata, xdata], [-ydata, -ydata], [-1, 1], color='gray', zdir='y')
         bead = ax3d.scatter([xdata], [-ydata], [0.], zdir='y', color='blue')
-        proj = ax3d.scatter([xdata], [-ydata], [0.], facecolor='gray', zdir='y')
+        proj = ax3d.scatter([xdata], [-ydata], [0.], zdir='y', facecolor='gray',)
 
 
         sliderAx = fig.add_axes([.6, .15+yOff, .6/winAspect, .02])
         yOff += deltaY
         sliderAx.set_xticks([]); sliderAx.set_yticks([])
         depth = 0.
-        depthProj = -.97
+        depthProj = -1.05
         slider = Slider(sliderAx, label, -1., 1., valinit=depth)
         bead.set_3d_properties(depth, zdir='y')
         proj.set_3d_properties(depthProj, zdir='y')
@@ -349,7 +358,6 @@ def on_press(event):
                        'yPos':ydata, 
                        'selected':False,
                        'circle':circle, 
-#                       'circleProj':circleProj,
                        'rod':rod, 
                        'bead':bead,
                        'proj':proj,
