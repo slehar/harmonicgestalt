@@ -153,36 +153,6 @@ poly2.set_color('w')
 poly2.set_edgecolor('k')
 ax3d.add_collection3d(poly2, zs=vertsZ, zdir='y')
 
-# Create zeroth point
-'''
-label = 'Pt %1d'%len(ptList)
-(xPos, yPos, zPos) = (-.5, -.2, 0.)
-print('xyz = %5.2f %5.2f %5.2f'%(xPos,yPos,zPos))
-circle = mpatches.Circle((xPos, yPos), ptRad)
-axStim.add_patch(circle)
-rod  = ax3d.plot([xPos, xPos], [-yPos, -yPos], [-1, 1], color='gray', zdir='y')
-bead = ax3d.scatter([xPos], [-yPos], [zPos], zdir='y', color='blue')
-bead.set_3d_properties(zPos, zdir='y')
-
-yOff = 0.; deltaY = -.03
-sliderAx = fig.add_axes([.6, .15+yOff, .6/winAspect, .02])
-yOff += deltaY
-sliderAx.set_xticks([]); sliderAx.set_yticks([])
-slider = Slider(sliderAx, label, -1., 1., valinit=0.)
-depth = slider.val
-
-
-ptList.append({'label':label, 
-               'xPos':xPos, 
-               'yPos':-yPos, 
-               'selected':False,
-               'circle':circle, 
-               'rod':rod, 
-               'bead':bead, 
-               'depth':zPos,
-               'sliderAx':sliderAx, 
-               'slider':slider,})
-'''
                                              
 def updateSliders(val):
     for pt in ptList:
@@ -208,6 +178,8 @@ axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 def on_keypress(event):
     global ptList, data, mute, shiftState, delta, yOff, deltaY
     
+#    print('keypress %s'%event.key)
+
     if event.key == 'shift':
        shiftState = True
     if shiftState:
@@ -290,6 +262,28 @@ def on_keypress(event):
         plt.pause(.001)
         updateWave()
          
+    elif event.key in ('+', '='):
+        ptList[-1]['depth'] += delta
+        (xPos, yPos, zPos) = ( ptList[-1]['xPos'],
+                              -ptList[-1]['yPos'],
+                               ptList[-1]['depth'])
+        ptList[-1]['slider'].set_val(zPos)
+        ptList[-1]['bead'].set_offsets([xPos, -yPos])
+        ptList[-1]['bead'].set_3d_properties(zPos, zdir='y')
+        plt.pause(.001)
+        updateWave()
+         
+    elif event.key in ('_', '-'):
+        ptList[-1]['depth'] -= delta
+        (xPos, yPos, zPos) = ( ptList[-1]['xPos'],
+                              -ptList[-1]['yPos'],
+                               ptList[-1]['depth'])
+        ptList[-1]['slider'].set_val(zPos)
+        ptList[-1]['bead'].set_offsets([xPos, -yPos])
+        ptList[-1]['bead'].set_3d_properties(zPos, zdir='y')
+        plt.pause(.001)
+        updateWave()
+         
     fig.canvas.draw()
 
     
@@ -342,10 +336,9 @@ def on_press(event):
         slider = Slider(sliderAx, label, -1., 1., valinit=depth)
         bead.set_3d_properties(depth, zdir='y')
         slider.on_changed(updateSliders)
-
         ptList.append({'label':label,
                        'xPos':xdata, 
-                       'yPos':-ydata, 
+                       'yPos':ydata, 
                        'selected':False,
                        'circle':circle, 
                        'rod':rod, 
