@@ -144,6 +144,7 @@ poly1.set_edgecolor('k')
 ax3d.add_collection3d(poly1, zs=vertsZ, zdir='y')
 
 # Front plane
+#verts3D = np.array([[-1,-1,-.95],[1,-1,-.95],[1,1,-.95],[-1,1,-.95],[-1,-1,-.95]])
 verts3D = np.array([[-1,-1,-1],[1,-1,-1],[1,1,-1],[-1,1,-1],[-1,-1,-1]])
 vertsXY = [verts3D[:,:2]]
 vertsZ  = verts3D[:,2]
@@ -323,26 +324,35 @@ def on_press(event):
         xdata = event.xdata
         ydata = event.ydata
         plt.sca(axStim)
+        
         circle = mpatches.Circle((xdata, ydata), ptRad) # 2D point in axStim
         axStim.add_patch(circle)
+         
         plt.sca(ax3d)
 
         rod  = ax3d.plot([xdata, xdata], [-ydata, -ydata], [-1, 1], color='gray', zdir='y')
         bead = ax3d.scatter([xdata], [-ydata], [0.], zdir='y', color='blue')
+        proj = ax3d.scatter([xdata], [-ydata], [0.], facecolor='gray', zdir='y')
+
+
         sliderAx = fig.add_axes([.6, .15+yOff, .6/winAspect, .02])
         yOff += deltaY
         sliderAx.set_xticks([]); sliderAx.set_yticks([])
         depth = 0.
+        depthProj = -.97
         slider = Slider(sliderAx, label, -1., 1., valinit=depth)
         bead.set_3d_properties(depth, zdir='y')
+        proj.set_3d_properties(depthProj, zdir='y')
         slider.on_changed(updateSliders)
         ptList.append({'label':label,
                        'xPos':xdata, 
                        'yPos':ydata, 
                        'selected':False,
                        'circle':circle, 
+#                       'circleProj':circleProj,
                        'rod':rod, 
-                       'bead':bead, 
+                       'bead':bead,
+                       'proj':proj,
                        'depth':depth,
                        'sliderAx':sliderAx, 
                        'slider':slider,})
