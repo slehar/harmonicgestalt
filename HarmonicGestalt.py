@@ -154,11 +154,9 @@ def updateWave():
     filtered = signal.convolve(yDataSwap, gaussWin, mode='same')
     filtered = filtered/filtered.max() * yDataSwap.max()
     line.set_ydata(yDataSwap)
-#    line1.set_ydata(filtered)
-    peakIndices = signal.find_peaks_cwt(yDataSwap, np.arange(1, 5), 
-                                        max_distances=np.arange(1, 5)*2,
-                                        min_snr=.1)
-    peakIndices = peakIndices[1:-1] # kludge - first & last peaks spurious
+
+    peakIndices = signal.find_peaks_cwt(yDataSwap, np.asarray([0.1, 0.2, 0.3]), 
+                                        min_snr=2.)
     nPeaks = len(peakIndices)
     peaksTxt.set_text('Peaks %3d'%nPeaks)
     lineIx = 0
