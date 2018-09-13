@@ -231,14 +231,21 @@ def on_keypress(event):
     elif len(ptList) <= 0:
         return
     elif event.key == 'backspace':
-        lastPt = ptList.pop()
-        lastPt['circle'].remove()
-        lastPt['rod'].pop(0).remove()
-        lastPt['bead'].remove()
-        lastPt['proj'].remove()
-        fig.canvas.draw()
-        updateWave()
-            
+        
+        if len(ptList) >= 1: # ptList == [1...]
+            lastPt = ptList.pop()
+            lastPt['circle'].remove()
+            lastPt['rod'].pop(0).remove()
+            lastPt['bead'].remove()
+            lastPt['proj'].remove()
+            fig.canvas.draw()
+            updateWave()
+        if len(ptList) <= 1: # ptList == [1]
+            axSpect.clear()
+            peaksTxt.set_text('Peaks   \nFreqs  ')
+            fig.canvas.draw()
+            updateWave()
+                    
     elif event.key in ('right', 'shift+right'):
         ptList[-1]['xPos'] += delta
         (xPos, yPos, zPos) = (ptList[-1]['xPos'],
