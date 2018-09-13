@@ -69,10 +69,11 @@ fig.canvas.set_window_title('Harmonic Gestalt')
 fig.text(1.02/winAspect, .5, 'click new point\ndrag move point')
 fig.text(1.02/winAspect, .4, 'arrow keys move\nlatest point')
 fig.text(1.02/winAspect, .3, '[shift] arrow keys for\nfast movement')
-fig.text(1.04/winAspect, .1, 'd : delete pt\n\nm : mute\n\nq : quit')
+fig.text(1.04/winAspect, .1, '[del] : delete pt\n\nm : mute\n\nq : quit')
 
 nPeaks = 0
-peaksTxt = fig.text(.9/winAspect, .13, 'Peaks %3d'%nPeaks)
+nFreqs = 0
+peaksTxt = fig.text(.9/winAspect, .13, 'Peaks %d\nFreqs %d'%(nPeaks,nFreqs))
 
 #### Main axes ####
 ax = fig.add_axes([.1, .225, .7, .75])
@@ -112,10 +113,6 @@ scale = slider1.val
 
 slider2 = VertSlider(axSl2, 'orient', -np.pi, np.pi, valinit=0.)
 orient = slider2.val
-
-# For smoothing Fourier signal Gaussian(nPts, )
-# p = 1: gaussian (smooth); p = .5: laplace (pointy peak)
-# gaussWin = signal.general_gaussian(51, p=0.5, sig=.5)
 
 ######## Keyboard callback updatewave ########
 # Update Wave to be played based on current dot positions
@@ -217,7 +214,7 @@ invMat = np.linalg.inv(transMat)
 # On Keypress Event 
 def on_keypress(event):
     global transmat
-    global ptList, data, mute, shiftState
+    global ptList, data, mute, shiftState, line
     
     
     if shiftState:
@@ -238,11 +235,17 @@ def on_keypress(event):
             mute = True
             stream.stop_stream()
     elif event.key == 'backspace':
-        if len(ptList) > 0:
+        if len(ptList) >= 1: # ptList == [1...]
             lastPt = ptList.pop()
             lastPt['circle'].remove()
             fig.canvas.draw()
             updateWave()
+        if len(ptList) <= 1: # ptList == [1]
+            axSpect.clear()
+            peaksTxt.set_text('Peaks   \nFreqs  ')
+            fig.canvas.draw()
+            updateWave()
+                        
     elif event.key in ('right', 'shift+right'):
             ptList[-1]['absPos'][0] += delta            
             ptList[-1]['transPos'] = np.matmul(ptList[-1]['absPos'], transMat)
