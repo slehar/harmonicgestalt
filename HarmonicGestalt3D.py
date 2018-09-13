@@ -15,6 +15,7 @@ import matplotlib.patches as mpatches
 import numpy as np
 from   matplotlib.widgets import Slider
 import pyaudio
+from scipy import signal
 
 plt.rcParams['image.cmap'] = 'gray' 
 
@@ -97,6 +98,25 @@ def updateWave():
 #    yData = np.log(yData)
     yDataSwap = np.fft.fftshift(yData)
     line.set_ydata(yDataSwap)
+    
+    peakIndices = signal.find_peaks_cwt(yDataSwap, np.asarray([0.1, 0.11, 0.12]), 
+                                        min_snr=1.)
+    nPeaks = len(peakIndices)
+    peaksTxt.set_text('Peaks %d\nFreqs %d'%(nPeaks,int((nPeaks-1)/2)))
+    lineIx = 0
+    for peak in peakArray:
+        peak[0].set_visible(False)
+    for peakIx in peakIndices:
+        freqAt = float(plotFreq[peakIx])
+#        print '%5.2f\t'%freqAt,
+        peakArray[lineIx][0].set_xdata((freqAt, freqAt))
+        peakArray[lineIx][0].set_ydata([0., 1000])
+        peakArray[lineIx][0].set_visible(True)
+        lineIx += 1
+#     
+    
+    
+    plt.pause(.001)    
     fig.canvas.draw()
     data = np.uint8(fData)
 
@@ -108,7 +128,11 @@ plt.close('all')
 fig = plt.figure(figsize=(figYSize,figXSize))
 fig.canvas.set_window_title('Harmonic Gestalt')
 fig.text(.008/winAspect, .9, 'click new point\ndrag move point')
-fig.text(.008/winAspect, .7, 'd : delete pt\n\nm : mute\n\n arrow keys move\n+/- keys depth \n\nq : quit')
+fig.text(.008/winAspect, .6, '[del] : delete pt\n\nm : mute\n\n arrow keys\n move last pt\n+/- keys\nadjust depth\n\nq : quit')
+
+nPeaks = 0
+nFreqs = 0
+peaksTxt = fig.text(.9/winAspect, .13, 'Peaks %d\nFreqs %d'%(nPeaks,nFreqs))
 
 #### Stimulus axes ####
 axStim = fig.add_axes([.1, .4/winAspect, .7/winAspect, .75])
@@ -173,6 +197,11 @@ plotFreq = plotTime - np.pi
 line, = axSpect.semilogy(plotFreq, plotData)
 axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 
+peakArray = []
+for x in range(21):
+    peakArray.append(axSpect.semilogy([(x-10)*2/10., (x-10)*2/10.],[0, 1000], 
+                                       color='r', visible=False))
+axSpect.set_yscale('symlog', linthreshy=PLOTWIDTH**0.5)
 
 
 # On Keypress Event
@@ -206,6 +235,7 @@ def on_keypress(event):
         lastPt['circle'].remove()
         lastPt['rod'].pop(0).remove()
         lastPt['bead'].remove()
+        lastPt['proj'].remove()
         fig.canvas.draw()
         updateWave()
             
