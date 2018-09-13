@@ -68,7 +68,7 @@ fig = plt.figure(figsize=(figYSize,figXSize))
 fig.canvas.set_window_title('Harmonic Gestalt')
 fig.text(1.02/winAspect, .5, 'click new point\ndrag move point')
 fig.text(1.02/winAspect, .4, 'arrow keys move\nlatest point')
-fig.text(1.02/winAspect, .3, '[shift] arrow keys for\n fast movement')
+fig.text(1.02/winAspect, .3, '[shift] arrow keys for\nfast movement')
 fig.text(1.04/winAspect, .1, 'd : delete pt\n\nm : mute\n\nq : quit')
 
 nPeaks = 0
@@ -115,7 +115,7 @@ orient = slider2.val
 
 # For smoothing Fourier signal Gaussian(nPts, )
 # p = 1: gaussian (smooth); p = .5: laplace (pointy peak)
-gaussWin = signal.general_gaussian(51, p=0.5, sig=.5)
+# gaussWin = signal.general_gaussian(51, p=0.5, sig=.5)
 
 ######## Keyboard callback updatewave ########
 # Update Wave to be played based on current dot positions
@@ -151,14 +151,14 @@ def updateWave():
 #    yData /= yData.max()
 #    yData = np.log(yData)
     yDataSwap = np.fft.fftshift(yData)
-    filtered = signal.convolve(yDataSwap, gaussWin, mode='same')
-    filtered = filtered/filtered.max() * yDataSwap.max()
+#    filtered = signal.convolve(yDataSwap, gaussWin, mode='same')
+#    filtered = filtered/filtered.max() * yDataSwap.max()
     line.set_ydata(yDataSwap)
 
-    peakIndices = signal.find_peaks_cwt(yDataSwap, np.asarray([0.1, 0.2, 0.3]), 
-                                        min_snr=2.)
+    peakIndices = signal.find_peaks_cwt(yDataSwap, np.asarray([0.1, 0.11, 0.12]), 
+                                        min_snr=1.)
     nPeaks = len(peakIndices)
-    peaksTxt.set_text('Peaks %3d'%nPeaks)
+    peaksTxt.set_text('Peaks %d\nFreqs %d'%(nPeaks,int((nPeaks-1)/2)))
     lineIx = 0
     for peak in peakArray:
         peak[0].set_visible(False)
