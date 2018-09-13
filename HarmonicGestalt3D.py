@@ -241,7 +241,7 @@ def on_keypress(event):
             fig.canvas.draw()
             updateWave()
         if len(ptList) <= 1: # ptList == [1]
-            axSpect.clear()
+            axSpect.cla()
             peaksTxt.set_text('Peaks   \nFreqs  ')
             fig.canvas.draw()
             updateWave()
@@ -368,7 +368,7 @@ def on_press(event):
         label = 'Pt %1d'%len(ptList)
         xdata = event.xdata
         ydata = event.ydata
-        print('ydata=%7.4f'%ydata)
+#        print('ydata=%7.4f'%ydata)
         plt.sca(axStim)
         
         circle = mpatches.Circle((xdata, ydata), ptRad) # 2D point in axStim

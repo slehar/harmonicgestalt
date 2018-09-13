@@ -67,9 +67,9 @@ plt.close('all')
 fig = plt.figure(figsize=(figYSize,figXSize))
 fig.canvas.set_window_title('Harmonic Gestalt')
 fig.text(1.02/winAspect, .5, 'click new point\ndrag move point')
-fig.text(1.02/winAspect, .4, 'arrow keys move\nlatest point')
-fig.text(1.02/winAspect, .3, '[shift] arrow keys for\nfast movement')
-fig.text(1.04/winAspect, .1, '[del] : delete pt\n\nm : mute\n\nq : quit')
+fig.text(1.02/winAspect, .45, 'arrow keys move\nlatest point')
+fig.text(1.02/winAspect, .4, '[shift] arrow keys for\nfast movement')
+fig.text(1.04/winAspect, .1, '[del] : delete pt\n\nm : mute\n\n+/- keys\nadjust depth\n\nq : quit')
 
 nPeaks = 0
 nFreqs = 0
